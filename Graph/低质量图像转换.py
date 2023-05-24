@@ -86,7 +86,7 @@ def process_images(folder_path, compression_ratio, noise_range, blur_radius, num
             # 保存扭曲后的图像
             for i, distorted_image in enumerate(distorted_images, start=1):
                 file_name_without_ext, ext = os.path.splitext(file_name)
-                save_name = f"{file_name_without_ext}_low{i}{ext}"
+                save_name = f"{file_name_without_ext}1_low{i}{ext}"
                 save_path = os.path.join(folder_path, save_name)
                 distorted_image.save(save_path)
 
@@ -97,7 +97,7 @@ def process_images(folder_path, compression_ratio, noise_range, blur_radius, num
 
             # 保存叠加后的图像
             file_name_without_ext, ext = os.path.splitext(file_name)
-            combined_save_name = f"{file_name_without_ext}_low_combined{ext}"
+            combined_save_name = f"{file_name_without_ext}1_low_combined{ext}"
             combined_save_path = os.path.join(folder_path, combined_save_name)
             combined_image.save(combined_save_path)
 
