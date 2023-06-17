@@ -2,13 +2,11 @@ import os
 import random
 from PIL import Image, ImageFilter, ImageDraw
 
-def select_mode(image, mode):
-    mode_dict = {1: "color", 2: "grayscale"}
-    selected_mode = mode_dict.get(mode)
-    if selected_mode == "grayscale":
-        return image.convert('L')
-    else:
+def select_mode(image):
+    if image.mode == "RGB" or image.mode == "RGBA":
         return image
+    else:
+        return image.convert('L')
 
 def add_noise(image, noise_range):
     width, height = image.size
@@ -81,14 +79,13 @@ def process_images(folder_path, compression_ratio, noise_range, blur_radius, num
         print("文件夹不存在。")
         return
 
-
     file_names = os.listdir(folder_path)
 
     for file_name in file_names:
         image_path = os.path.join(folder_path, file_name)
         if os.path.isfile(image_path):
             image = Image.open(image_path)
-            image = select_mode(image, image_mode)
+            image = select_mode(image)
 
             compressed_image = compress_image(image, compression_ratio)
             distorted_images = distort_image(compressed_image, noise_range, blur_radius, num_stains, stain_size)
@@ -114,9 +111,6 @@ def process_images(folder_path, compression_ratio, noise_range, blur_radius, num
 
 # 输入文件夹路径
 folder_path = input("请输入文件夹路径：")
-
-# 输入图像模式
-image_mode = int(input("请选择图像模式（输入对应的数字）：\n1. 彩色（color）\n2. 灰度（grayscale）\n"))
 
 # 输入压缩比
 compression_ratio = float(input("请输入压缩比（0-1之间的小数）：")) # 0.5
