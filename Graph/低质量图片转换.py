@@ -2,15 +2,31 @@ import os
 import random
 from PIL import Image, ImageFilter, ImageDraw
 
+def select_mode(image, mode):
+    mode_dict = {1: "color", 2: "grayscale"}
+    selected_mode = mode_dict.get(mode)
+    if selected_mode == "grayscale":
+        return image.convert('L')
+    else:
+        return image
+
 def add_noise(image, noise_range):
     width, height = image.size
     pixels = image.load()
     for y in range(height):
         for x in range(width):
-            pixel = pixels[x, y]
-            noise = random.randint(-noise_range, noise_range)
-            pixel = max(0, min(255, pixel + noise))
-            pixels[x, y] = pixel
+            if image.mode == "RGB":
+                r, g, b = pixels[x, y]
+                noise = random.randint(-noise_range, noise_range)
+                r = max(0, min(255, r + noise))
+                g = max(0, min(255, g + noise))
+                b = max(0, min(255, b + noise))
+                pixels[x, y] = (r, g, b)
+            else:  # 对于灰度图像只有一个通道
+                pixel = pixels[x, y]
+                noise = random.randint(-noise_range, noise_range)
+                pixel = max(0, min(255, pixel + noise))
+                pixels[x, y] = pixel
     return image
 
 def add_blur(image, blur_radius):
@@ -24,9 +40,13 @@ def add_stains(image, num_stains, stain_size):
         x = random.randint(0, width)
         y = random.randint(0, height)
         size = random.randint(stain_size[0], stain_size[1])
-        color = random.randint(0, 255)
+        if image.mode == "RGB":  # for RGB images
+            color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        else:  # for grayscale images
+            color = random.randint(0, 255)
         draw.ellipse([(x, y), (x+size, y+size)], fill=color)
     return image
+
 
 def distort_image(image, noise_range, blur_radius, num_stains, stain_size):
     image_low_1 = image.copy()
@@ -61,20 +81,21 @@ def process_images(folder_path, compression_ratio, noise_range, blur_radius, num
         print("文件夹不存在。")
         return
 
+
     file_names = os.listdir(folder_path)
 
     for file_name in file_names:
         image_path = os.path.join(folder_path, file_name)
         if os.path.isfile(image_path):
-            image = Image.open(image_path).convert('L')
+            image = Image.open(image_path)
+            image = select_mode(image, image_mode)
 
             compressed_image = compress_image(image, compression_ratio)
-
             distorted_images = distort_image(compressed_image, noise_range, blur_radius, num_stains, stain_size)
 
             for i, distorted_image in enumerate(distorted_images, start=1):
                 file_name_without_ext, ext = os.path.splitext(file_name)
-                save_name = f"{file_name_without_ext}1_low{i}{ext}"
+                save_name = f"{file_name_without_ext}_low{i}{ext}"
                 save_path = os.path.join(folder_path, save_name)
                 distorted_image.save(save_path)
 
@@ -83,7 +104,7 @@ def process_images(folder_path, compression_ratio, noise_range, blur_radius, num
                 combined_image = Image.blend(combined_image, distorted_image, 0.5)
 
             file_name_without_ext, ext = os.path.splitext(file_name)
-            combined_save_name = f"{file_name_without_ext}1_low_combined{ext}"
+            combined_save_name = f"{file_name_without_ext}_low_combined{ext}"
             combined_save_path = os.path.join(folder_path, combined_save_name)
             combined_image.save(combined_save_path)
 
@@ -93,6 +114,9 @@ def process_images(folder_path, compression_ratio, noise_range, blur_radius, num
 
 # 输入文件夹路径
 folder_path = input("请输入文件夹路径：")
+
+# 输入图像模式
+image_mode = int(input("请选择图像模式（输入对应的数字）：\n1. 彩色（color）\n2. 灰度（grayscale）\n"))
 
 # 输入压缩比
 compression_ratio = float(input("请输入压缩比（0-1之间的小数）：")) # 0.5
