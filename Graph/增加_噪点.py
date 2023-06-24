@@ -6,6 +6,16 @@ from PIL import Image
 
 
 def add_noise(image, noise_range):
+    """
+    给图像添加噪点。
+
+    参数：
+    - image: 图像对象
+    - noise_range: 噪点范围，0-255 之间的整数
+
+    返回：
+    处理后的图像对象
+    """
     width, height = image.size
     pixels = image.load()
     for y in range(height):
@@ -16,12 +26,34 @@ def add_noise(image, noise_range):
             pixels[x, y] = pixel
     return image
 
+
 def distort_image(image, noise_range):
+    """
+    复制输入的图像对象并添加噪点。
+
+    参数：
+    - image: 图像对象
+    - noise_range: 噪点范围，0-255 之间的整数
+
+    返回：
+    处理后的图像对象
+    """
     image_low = image.copy()
     image_low = add_noise(image_low, noise_range)
     return image_low
 
+
 def process_images(folder_path, noise_range):
+    """
+    处理给定文件夹中的所有图像文件。
+
+    参数：
+    - folder_path: 文件夹路径
+    - noise_range: 噪点范围，0-255 之间的整数
+
+    返回：
+    无
+    """
     if not os.path.exists(folder_path):
         print("文件夹不存在。")
         return
