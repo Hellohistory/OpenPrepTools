@@ -9,6 +9,7 @@ import webbrowser
 class MD5CheckerApp:
     def __init__(self, root):
         self.root = root
+        self.root.iconbitmap("logo_2.ico")
         self.performance_check = tk.BooleanVar()
         self.performance_check.set(False)
         self.setup_ui()
@@ -51,6 +52,12 @@ class MD5CheckerApp:
 
         # 链接访问框架
         self.setup_links(main_frame)
+
+    def set_logo(self, logo_path):
+        """设置Logo"""
+        self.logo = tk.PhotoImage(file=logo_path)
+        self.logo_label = tk.Label(self.root, image=self.logo)
+        self.logo_label.pack()
 
     def setup_links(self, main_frame):
         """设置底部链接"""
