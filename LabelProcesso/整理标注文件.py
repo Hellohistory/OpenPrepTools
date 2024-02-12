@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import os
 
+
 def process_xml(input_file, output_file):
     tree = ET.parse(input_file)
     root = tree.getroot()
@@ -25,6 +26,7 @@ def process_xml(input_file, output_file):
     new_tree.write(output_path)
 
     print('处理结果已保存到:', output_path)
+
 
 # 指定输入XML文件路径和输出目录
 input_xml_file = 'K:\OCR训练集\新建文件夹 (2)\诗经通论_一_03.xml'

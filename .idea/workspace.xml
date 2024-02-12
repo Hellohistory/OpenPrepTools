@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6efb3a4b-c275-41b2-b5fa-ee9dd4e06208" name="更改" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/PrepPro.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PrepPro.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/other.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Graph/Cython/低质量图片转换/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Graph/Cython/低质量图片转换/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Graph/增加_噪点.py" beforeDir="false" afterPath="$PROJECT_DIR$/Graph/增加_噪点.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LabelProcesso/已标注图片切割.py" beforeDir="false" afterPath="$PROJECT_DIR$/LabelProcesso/已标注图片切割.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LabelProcesso/整理标注文件.py" beforeDir="false" afterPath="$PROJECT_DIR$/LabelProcesso/整理标注文件.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/JSON组合_文白对照.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text/JSON组合_文白对照.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/转换UTF-8编码.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text/转换UTF-8编码.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2Ui5M5xdXO70khH22kIZBIcIveA" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.已标注图片切割.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "D:/Code/GithubProject/PrepPro",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "http.proxy",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-50da183f06c8-2887949eec09-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.13135.95" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="6efb3a4b-c275-41b2-b5fa-ee9dd4e06208" name="更改" comment="" />
+      <created>1693409510074</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1693409510074</updated>
+      <workItem from="1693409511199" duration="385000" />
+      <workItem from="1693410032602" duration="601000" />
+      <workItem from="1705562284922" duration="3640000" />
+      <workItem from="1705590257299" duration="1528000" />
+      <workItem from="1705649289698" duration="4395000" />
+      <workItem from="1705659489525" duration="595000" />
+      <workItem from="1707060472735" duration="21000" />
+      <workItem from="1707708736443" duration="982000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/PrepPro$.coverage" NAME="已标注图片切割 覆盖结果" MODIFIED="1707709695462" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/LabelProcesso" />
+  </component>
+</project>

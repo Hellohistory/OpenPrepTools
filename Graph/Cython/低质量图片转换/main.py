@@ -1,5 +1,6 @@
 import image_processing  # 导入我们的Cython扩展模块
 
+
 def main():
     # 输入文件夹路径
     folder_path = input("请输入文件夹路径：")
@@ -22,6 +23,7 @@ def main():
     stain_size = (stain_size_min, stain_size_max)
 
     image_processing.process_images(folder_path, compression_ratio, noise_range, blur_radius, num_stains, stain_size)
+
 
 if __name__ == "__main__":
     main()
