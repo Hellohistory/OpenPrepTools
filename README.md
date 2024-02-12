@@ -29,4 +29,5 @@ OpenPrepTools 项目提供了一系列工具，帮助用户高效进行数据预
 
 ## 联系方式
 
-- GitHub: [Hellohistory](https://github.com/Hellohistory)
+- GitHub：[https://github.com/Hellohistory/OpenPrepTools]
+- Gitee：[https://gitee.com/Hellohistory/OpenPrepTools]
