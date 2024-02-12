@@ -57,10 +57,10 @@ class MD5CheckerApp:
         link_frame = tk.Frame(main_frame)
         link_frame.pack(fill=tk.X, expand=False, pady=5)
         links = {
-            "源码（GitHub）": "https://gist.github.com/Hellohistory/32af2c9eba1ebce32e48b6d8516eb988",
-            "源码（Gitee）": "https://gitee.com",
-            "更多项目（GitHub）": "https://github.com",
-            "更多项目（Gitee）": "https://gitee.com",
+            "源码直览（GitHub）": "https://gist.github.com/Hellohistory/32af2c9eba1ebce32e48b6d8516eb988",
+            "源码直览（Gitee）": "https://gitee.com/hellohistory/codes/nyvzsu18jxk0rctode5l759",
+            "更多项目（GitHub）": "https://github.com/Hellohistory/OpenPrepTools",
+            "更多项目（Gitee）": "https://gitee.com/hellohistory/OpenPrepTools",
         }
         for i, (text, url) in enumerate(links.items()):
             link_label = tk.Label(link_frame, text=text, fg="blue", cursor="hand2")
