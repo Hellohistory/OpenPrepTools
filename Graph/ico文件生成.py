@@ -4,8 +4,24 @@ import questionary
 from rich.console import Console
 from rich.prompt import Prompt
 from rich import print as rprint
+from rich.table import Table
 
 console = Console()
+
+
+def display_intro():
+    table = Table(title="程序介绍")
+
+    table.add_column("项目", justify="right", style="cyan", no_wrap=True)
+    table.add_column("信息(按下Ctrl后点击链接访问)", style="magenta")
+
+    table.add_row("程序名称", "ICO生成")
+    table.add_row("开发者", "Hellohistory")
+    table.add_row("项目源码(Github)", "https://gist.github.com/Hellohistory/f9c6dc2380cadc60ccf261a47ece958c")
+    table.add_row("更多项目(Github)", "https://github.com/Hellohistory/OpenPrepTools")
+    table.add_row("更多项目(Gitee)", "https://gitee.com/Hellohistory/OpenPrepTools")
+
+    console.print(table)
 
 
 def check_supported_format(file_path):
@@ -66,6 +82,7 @@ def convert_image_to_multiple_icos(input_path, target_directory=None, sizes=None
 
 
 def main():
+    display_intro()
     input_path = Prompt.ask("[bold magenta]请输入图片文件路径[/]")
     target_directory = Prompt.ask("[bold magenta]请输入ICO文件保存的目录[留空则使用源文件所在目录]:", default="")
     sizes = select_icon_sizes()
