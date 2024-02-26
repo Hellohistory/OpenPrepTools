@@ -5,23 +5,19 @@ from rich.console import Console
 from rich.prompt import Prompt
 from rich import print as rprint
 
-# 创建Rich控制台实例
 console = Console()
 
 
-# 检查文件格式是否支持
 def check_supported_format(file_path):
     supported_formats = ['png', 'jpg', 'jpeg', 'tif', 'bmp']
     ext = os.path.splitext(file_path)[-1].lower().strip('.')
     return ext in supported_formats
 
 
-# 检查文件是否存在
 def check_file_existence(file_path):
     return os.path.isfile(file_path)
 
 
-# 选择图标尺寸
 def select_icon_sizes():
     sizes = questionary.checkbox(
         "选择要生成的ICO图标尺寸:",
@@ -41,7 +37,6 @@ def select_icon_sizes():
     return [(int(size.split('x')[0]), int(size.split('x')[1])) for size in sizes]
 
 
-# 将图片转换为多个尺寸的ICO图标
 def convert_image_to_multiple_icos(input_path, target_directory=None, sizes=None):
     if not check_supported_format(input_path):
         rprint("[bold red]不支持的图片格式，请输入PNG、JPEG、TIFF、BMP格式的图片。[/]")
