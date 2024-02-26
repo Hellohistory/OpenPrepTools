@@ -20,7 +20,8 @@ AUTHOR_NAME = "Hellohistory"
 
 def display_script_info():
     """显示脚本信息"""
-    header_markdown = Markdown(f"# 文件整理工具\n\n👤 作者: {AUTHOR_NAME}\n🔗 GitHub: [链接]({GITHUB_URL})\n\n[脚本信息] 这是一个用于文件整理的脚本，包括文件移动、文件夹重命名等功能。")
+    header_markdown = Markdown(
+        f"# 文件整理工具\n\n👤 作者: {AUTHOR_NAME}\n🔗 GitHub: [链接]({GITHUB_URL})\n\n[脚本信息] 这是一个用于文件整理的脚本，包括文件移动、文件夹重命名等功能。")
     console.print(Panel(header_markdown, title="[bold magenta]欢迎[/bold magenta]", expand=False, border_style="red"))
 
 
@@ -75,7 +76,7 @@ def move_files():
 
 
 def rename_folders():
-    """重命名文件夹的功能实现"""
+    """重命名文件夹的功能实现，去掉'_'和后续数字"""
     base_dir = Prompt.ask("请输入文件夹所在的基本路径", console=console)
     start_number_str = Prompt.ask("请输入文件夹编号起始数字", default="100", console=console)
     start_number = int(start_number_str)
@@ -83,7 +84,7 @@ def rename_folders():
     folders = [d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))]
     for folder_name in track(sorted(folders), description="正在重命名文件夹..."):
         old_path = os.path.join(base_dir, folder_name)
-        new_folder_name = f"{start_number:03d}_{folder_name}"
+        new_folder_name = f"{start_number:03d}"  # 去掉'_'和后续数字
         new_path = os.path.join(base_dir, new_folder_name)
         os.rename(old_path, new_path)
         console.log(f"文件夹 {old_path} 重命名为 {new_path}")
@@ -163,14 +164,17 @@ def move_subfolder_files_to_parent():
 
 def split_folder(folder_path, subfolder_count):
     """将文件夹中的文件均匀分配到指定数量的子文件夹中"""
-    files = os.listdir(folder_path)
-    files_per_subfolder = len(files) // subfolder_count
+    files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
+    total_files = len(files)
+    files_per_subfolder, remainder = divmod(total_files, subfolder_count)
+
+    current_file_index = 0
     for i in range(subfolder_count):
         subfolder_path = os.path.join(folder_path, f"{i + 1}")
         os.makedirs(subfolder_path, exist_ok=True)
-        for j in range(files_per_subfolder):
-            file_path = os.path.join(folder_path, files[j + i * files_per_subfolder])
-            shutil.move(file_path, subfolder_path)
+        for j in range(files_per_subfolder + (1 if i < remainder else 0)):
+            shutil.move(os.path.join(folder_path, files[current_file_index]), subfolder_path)
+            current_file_index += 1
     console.log("文件移动完成！")
 
 
@@ -196,8 +200,8 @@ def main():
         "3": ("选择日志级别", select_log_level),
         "4": ("备份文件", backup_files),
         "5": ("将子文件夹内的文件移动到父文件夹", move_subfolder_files_to_parent),
-        "6": ("文件夹中文件平均分配到子文件夹", split_folder),
-        "7": ("移动源文件夹中的所有文件到目标文件夹", move_all_files)
+        "6": ("文件夹中文件平均分配到子文件夹", lambda: split_folder_prompt()),
+        "7": ("移动源文件夹中的所有文件到目标文件夹", lambda: move_all_files_prompt())
     }
 
     while True:
@@ -214,6 +218,18 @@ def main():
             func()
 
     display_footer()
+
+
+def split_folder_prompt():
+    folder_path = Prompt.ask("请输入需要分配的文件夹路径", console=console)
+    subfolder_count = int(Prompt.ask("请输入子文件夹数量", console=console))
+    split_folder(folder_path, subfolder_count)
+
+
+def move_all_files_prompt():
+    source_folder = Prompt.ask("请输入源文件夹路径", console=console)
+    destination_folder = Prompt.ask("请输入目标文件夹路径", console=console)
+    move_all_files(source_folder, destination_folder)
 
 
 if __name__ == "__main__":
