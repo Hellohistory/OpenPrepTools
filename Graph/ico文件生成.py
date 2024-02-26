@@ -82,11 +82,16 @@ def convert_image_to_multiple_icos(input_path, target_directory=None, sizes=None
 
 
 def main():
-    display_intro()
-    input_path = Prompt.ask("[bold magenta]请输入图片文件路径[/]")
-    target_directory = Prompt.ask("[bold magenta]请输入ICO文件保存的目录[留空则使用源文件所在目录]:", default="")
-    sizes = select_icon_sizes()
-    convert_image_to_multiple_icos(input_path, target_directory, sizes)
+    while True:
+        display_intro()
+        input_path = Prompt.ask("[bold magenta]请输入图片文件路径[/]")
+        target_directory = Prompt.ask("[bold magenta]请输入ICO文件保存的目录[留空则使用源文件所在目录]:", default="")
+        sizes = select_icon_sizes()
+        convert_image_to_multiple_icos(input_path, target_directory, sizes)
+
+        continue_choice = Prompt.ask("[bold cyan]继续使用请输入'y'，退出请输入任意其他键[/]", default="n")
+        if continue_choice.lower() != 'y':
+            break
 
 
 if __name__ == "__main__":
