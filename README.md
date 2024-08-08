@@ -35,9 +35,10 @@ OpenPrepTools 项目提供了一系列工具，帮助用户高效进行数据预
 
 ## 许可证
 
-本项目采用 [Apache 2.0 许可证](LICENSE)。在使用 OpenPrepTools 项目中的工具时，请确保遵守相应的许可证条款。
+本项目整体采用 [Apache 2.0 许可证](LICENSE)。由于本项目部分项目使用 `GPL` 协议，其传染性因此亦采用 `GPL` 协议。
+
+因此使用 `OpenPrepTools` 项目中的工具时，请确保遵守相应的许可证条款。
 
 ## 联系方式
 
-- GitHub：[https://github.com/Hellohistory/OpenPrepTools]
-- Gitee：[https://gitee.com/Hellohistory/OpenPrepTools]
+如有问题或建议，请通过Issues联系即可。
