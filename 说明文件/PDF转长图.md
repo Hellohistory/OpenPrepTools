@@ -33,7 +33,7 @@ pip install nuitka
 ``
 2. 输入下面的命令
 ``
-nuitka --standalone --mingw64 --output-dir=dist --enable-plugin=pyqt5 --windows-disable-console --windows-icon-from-ico=logo_6.ico PDF2Longimg.py
+nuitka --standalone --mingw64 --output-dir=dist --enable-plugin=pyqt5 --windows-console-mode=disable --windows-icon-from-ico=logo_6.ico PDF2Longimg.py
 ``
 
 ## 运行界面展示
