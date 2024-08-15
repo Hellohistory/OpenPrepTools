@@ -257,17 +257,24 @@ def extract_images_from_pdf(pdf_path, zoom_factor, log_func):
     pdf_doc = fitz.open(pdf_path)
     zoom_matrix = fitz.Matrix(zoom_factor, zoom_factor)
 
-    images = []
+    images_with_order = []
     try:
         with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
-            futures = [executor.submit(process_page, pdf_doc, page_num, zoom_matrix) for page_num in range(len(pdf_doc))]
+            futures = {executor.submit(process_page, pdf_doc, page_num, zoom_matrix): page_num for page_num in
+                       range(len(pdf_doc))}
             for future in as_completed(futures):
+                page_num = futures[future]
                 try:
-                    images.append(future.result())
+                    img = future.result()
+                    images_with_order.append((page_num, img))
                 except Exception as e:
-                    log_func(f"页面处理失败: {e}")
+                    log_func(f"页面 {page_num} 处理失败: {e}")
     except Exception as e:
         log_func(f"PDF处理失败: {e}")
+
+    # 按照页面顺序排序
+    images_with_order.sort(key=lambda x: x[0])
+    images = [img for _, img in images_with_order]
 
     return images
 
