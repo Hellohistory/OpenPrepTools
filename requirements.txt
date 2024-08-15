@@ -13,3 +13,8 @@ zxcvbn
 fastapi
 uvicorn
 pymupdf==1.19.6
+win10toast
+matplotlib
+psutil
+requests
+nuitka
