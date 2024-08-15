@@ -8,4 +8,8 @@ future
 questionary
 argparse
 faker
+pyperclip
+zxcvbn
+fastapi
+uvicorn
 pymupdf==1.19.6

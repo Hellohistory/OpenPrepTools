@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+import tempfile  # 用于创建临时文件夹
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import fitz  # PyMuPDF
@@ -18,6 +19,7 @@ class PDFToLongImageApp(QWidget):
         self.pdf_files = []
         self.pdf_folders = []
         self.output_folder_path = ""
+        self.temp_dir = tempfile.mkdtemp()  # 创建临时文件夹
 
         # 设置应用程序图标
         self.setWindowIcon(QIcon('logo_6.ico'))
@@ -51,12 +53,21 @@ class PDFToLongImageApp(QWidget):
 
         # 图像缩放比例选择
         hbox = QHBoxLayout()
-        hbox.addWidget(QLabel("图像缩放比例:", self))
+        hbox.addWidget(QLabel("图像清晰度等级(最高 5 级):", self))
         self.zoom_factor_spinbox = QSpinBox(self)
         self.zoom_factor_spinbox.setRange(1, 5)
         self.zoom_factor_spinbox.setValue(2)
         hbox.addWidget(self.zoom_factor_spinbox)
         layout.addLayout(hbox)
+
+        # 图像张数选择
+        hbox_images_per_long = QHBoxLayout()
+        hbox_images_per_long.addWidget(QLabel("每张长图的图片数量:", self))
+        self.images_per_long_spinbox = QSpinBox(self)
+        self.images_per_long_spinbox.setRange(1, 100)
+        self.images_per_long_spinbox.setValue(10)  # 默认值为10张图片拼接一张长图
+        hbox_images_per_long.addWidget(self.images_per_long_spinbox)
+        layout.addLayout(hbox_images_per_long)
 
         # 保存文件夹选择
         file_save_layout = QHBoxLayout()
@@ -74,7 +85,7 @@ class PDFToLongImageApp(QWidget):
         layout.addWidget(self.log_text_edit)
 
         # 开始转换按钮
-        self.btn_start = QPushButton('开始批量转换', self)
+        self.btn_start = QPushButton('开始转换', self)
         self.btn_start.setEnabled(False)
         self.btn_start.clicked.connect(self.batch_convert_pdf_to_image)
         layout.addWidget(self.btn_start)
@@ -155,7 +166,8 @@ class PDFToLongImageApp(QWidget):
 
     def select_pdf_or_folder(self):
         options = QFileDialog.Options()
-        pdf_path = QFileDialog.getExistingDirectory(self, "选择PDF文件夹") if self.sender().text() == '选择PDF文件/文件夹' else None
+        pdf_path = QFileDialog.getExistingDirectory(self,
+                                                    "选择PDF文件夹") if self.sender().text() == '选择PDF文件/文件夹' else None
         if pdf_path:
             self.pdf_label.setText(f'已选择文件夹: {os.path.basename(pdf_path)}')
             self.pdf_path_line_edit.setText(pdf_path)
@@ -196,7 +208,7 @@ class PDFToLongImageApp(QWidget):
         self.log_text_edit.clear()
 
         # 启动后台线程进行批量PDF转长图
-        self.thread = BatchConvertThread(pdf_files, output_folder_path, zoom_factor)
+        self.thread = BatchConvertThread(pdf_files, output_folder_path, zoom_factor, self.temp_dir, self.images_per_long_spinbox.value())
         self.thread.update_progress.connect(self.progress.setValue)
         self.thread.log_message.connect(self.log_text_edit.append)
         self.thread.completed.connect(self.on_batch_conversion_completed)
@@ -213,7 +225,6 @@ class PDFToLongImageApp(QWidget):
         try:
             with open("settings.json", "r") as f:
                 settings = json.load(f)
-                self.pdf_path_line_edit.setText(settings.get("pdf_path", ""))
                 self.save_path_line_edit.setText(settings.get("save_path", ""))
                 self.zoom_factor_spinbox.setValue(settings.get("zoom_factor", 2))
         except FileNotFoundError:
@@ -221,7 +232,6 @@ class PDFToLongImageApp(QWidget):
 
     def save_settings(self):
         settings = {
-            "pdf_path": self.pdf_path_line_edit.text(),
             "save_path": self.save_path_line_edit.text(),
             "zoom_factor": self.zoom_factor_spinbox.value(),
         }
@@ -233,50 +243,110 @@ class PDFToLongImageApp(QWidget):
         event.accept()
 
 
-def concatenate_images_vertically(images):
-    total_height = sum(img.height for img in images)
-    max_width = max(img.width for img in images)
+def concatenate_images_vertically(image_paths, output_image_base_path, images_per_long):
+    MAX_IMAGE_DIMENSION = 65500  # Pillow的最大支持尺寸
 
-    long_image = Image.new("RGB", (max_width, total_height))
-    y_offset = 0
-    for img in images:
-        long_image.paste(img, (0, y_offset))
-        y_offset += img.height
+    total_images = len(image_paths)
+    part = 0
 
-    return long_image
+    for i in range(0, total_images, images_per_long):
+        part += 1
+        current_images = image_paths[i:i + images_per_long]
+
+        total_height = sum(Image.open(img).height for img in current_images)
+        max_width = max(Image.open(img).width for img in current_images)
+
+        # 如果总高度超过最大值，则分割处理
+        if total_height > MAX_IMAGE_DIMENSION:
+            current_part_images = []
+            current_part_height = 0
+            sub_part = 1
+
+            for img_path in current_images:
+                img_height = Image.open(img_path).height
+                if current_part_height + img_height > MAX_IMAGE_DIMENSION:
+                    # 保存当前分片
+                    long_image = Image.new("RGB", (max_width, current_part_height))
+                    y_offset = 0
+                    for part_img in current_part_images:
+                        img = Image.open(part_img)
+                        long_image.paste(img, (0, y_offset))
+                        y_offset += img.height
+                    output_image_path = f"{output_image_base_path}_part{part}_sub{sub_part}.jpg"
+                    long_image.save(output_image_path)
+                    sub_part += 1
+                    current_part_images.clear()
+                    current_part_height = 0
+
+                # 添加图片到当前分片
+                current_part_images.append(img_path)
+                current_part_height += img_height
+
+            # 保存最后的分片
+            if current_part_images:
+                long_image = Image.new("RGB", (max_width, current_part_height))
+                y_offset = 0
+                for part_img in current_part_images:
+                    img = Image.open(part_img)
+                    long_image.paste(img, (0, y_offset))
+                    y_offset += img.height
+                output_image_path = f"{output_image_base_path}_part{part}_sub{sub_part}.jpg"
+                long_image.save(output_image_path)
+
+        else:
+            # 正常处理
+            long_image = Image.new("RGB", (max_width, total_height))
+
+            y_offset = 0
+            for img_path in current_images:
+                img = Image.open(img_path)
+                long_image.paste(img, (0, y_offset))
+                y_offset += img.height
+
+            output_image_path = f"{output_image_base_path}_part{part}.jpg"
+            long_image.save(output_image_path)
+
+        # 清理临时文件
+        for img_path in current_images:
+            os.remove(img_path)
 
 
-def process_page(pdf_doc, page_num, zoom_matrix):
-    page = pdf_doc.load_page(page_num)
-    pix = page.get_pixmap(matrix=zoom_matrix)
-    img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
-    return img
-
-
-def extract_images_from_pdf(pdf_path, zoom_factor, log_func):
-    pdf_doc = fitz.open(pdf_path)
-    zoom_matrix = fitz.Matrix(zoom_factor, zoom_factor)
-
-    images_with_order = []
+def process_page(pdf_doc, page_num, zoom_matrix, temp_dir):
     try:
-        with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
-            futures = {executor.submit(process_page, pdf_doc, page_num, zoom_matrix): page_num for page_num in
-                       range(len(pdf_doc))}
-            for future in as_completed(futures):
-                page_num = futures[future]
-                try:
-                    img = future.result()
-                    images_with_order.append((page_num, img))
-                except Exception as e:
-                    log_func(f"页面 {page_num} 处理失败: {e}")
+        page = pdf_doc.load_page(page_num)
+        pix = page.get_pixmap(matrix=zoom_matrix)
+        img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
+
+        # 使用数字序列命名每个页面的图片，避免复杂命名
+        image_path = os.path.join(temp_dir, f"{page_num + 1}.png")
+        img.save(image_path, format='PNG')
+        return image_path
     except Exception as e:
-        log_func(f"PDF处理失败: {e}")
+        return None, f"页面 {page_num} 处理失败: {e}"
 
-    # 按照页面顺序排序
-    images_with_order.sort(key=lambda x: x[0])
-    images = [img for _, img in images_with_order]
 
-    return images
+def extract_images_from_pdf(pdf_path, zoom_factor, temp_dir, log_func):
+    try:
+        log_func(f"开始处理文件: {pdf_path}")
+        pdf_doc = fitz.open(pdf_path)
+        zoom_matrix = fitz.Matrix(zoom_factor, zoom_factor)
+
+        images = []
+        with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+            futures = {
+                executor.submit(process_page, pdf_doc, page_num, zoom_matrix, temp_dir): page_num
+                for page_num in range(len(pdf_doc))}
+            for future in as_completed(futures):
+                result = future.result()
+                if result:
+                    images.append(result)
+                else:
+                    log_func(f"页面 {futures[future]} 处理失败")
+        log_func(f"文件处理完成: {pdf_path}")
+        return images
+    except Exception as e:
+        log_func(f"处理PDF失败: {e}")
+        return []
 
 
 class BatchConvertThread(QThread):
@@ -284,11 +354,13 @@ class BatchConvertThread(QThread):
     log_message = pyqtSignal(str)
     completed = pyqtSignal(dict)
 
-    def __init__(self, pdf_files, output_folder_path, zoom_factor):
+    def __init__(self, pdf_files, output_folder_path, zoom_factor, temp_dir, images_per_long):
         super().__init__()
         self.pdf_files = pdf_files
         self.output_folder_path = output_folder_path
         self.zoom_factor = zoom_factor
+        self.temp_dir = temp_dir
+        self.images_per_long = images_per_long
 
     def run(self):
         total_files = len(self.pdf_files)
@@ -296,20 +368,23 @@ class BatchConvertThread(QThread):
 
         for i, pdf_file in enumerate(self.pdf_files):
             try:
-                output_image_path = os.path.join(self.output_folder_path, os.path.splitext(os.path.basename(pdf_file))[0] + ".jpg")
-                images = extract_images_from_pdf(pdf_file, self.zoom_factor, self.log_message.emit)
+                # 长图文件名使用原PDF文件名
+                output_image_base_path = os.path.join(self.output_folder_path,
+                                                      os.path.splitext(os.path.basename(pdf_file))[0])
+
+                images = extract_images_from_pdf(pdf_file, self.zoom_factor, self.temp_dir, self.log_message.emit)
                 if images:
-                    long_image = concatenate_images_vertically(images)
-                    long_image.save(output_image_path)
+                    concatenate_images_vertically(images, output_image_base_path, self.images_per_long)
+                    self.log_message.emit(f"文件转换成功: {pdf_file}")
+                else:
+                    raise ValueError("未生成图像")
             except Exception as e:
                 failed_files.append(pdf_file)
                 self.log_message.emit(f"文件 {pdf_file} 转换失败: {e}")
 
-            # 更新进度
             progress_value = int((i + 1) / total_files * 100)
             self.update_progress.emit(progress_value)
 
-        # 返回转换结果总结
         summary = {
             "failed": failed_files,
         }
