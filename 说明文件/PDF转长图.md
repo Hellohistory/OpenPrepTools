@@ -42,6 +42,43 @@ cd Graph
 nuitka --standalone --mingw64 --output-dir=dist --enable-plugin=pyqt5 --windows-console-mode=disable --windows-icon-from-ico=logo_6.ico PDF2Longimg.py
 ``
 
+## 如果在编译过程中出现以下错误
+```angular2html
+Traceback (most recent call last):
+  File "E:\Code\Github\OpenPrepTools\.venv\lib\site-packages\nuitka\__main__.py", line 206, in <module>
+    main()
+  File "E:\Code\Github\OpenPrepTools\.venv\lib\site-packages\nuitka\__main__.py", line 188, in main
+    MainControl.main()
+  File "E:\Code\Github\OpenPrepTools\.venv\lib\site-packages\nuitka\MainControl.py", line 1155, in main
+    _main()
+  File "E:\Code\Github\OpenPrepTools\.venv\lib\site-packages\nuitka\MainControl.py", line 1004, in _main
+    result, scons_options = compileTree()
+  File "E:\Code\Github\OpenPrepTools\.venv\lib\site-packages\nuitka\MainControl.py", line 919, in compileTree
+    result, scons_options = runSconsBackend()
+  File "E:\Code\Github\OpenPrepTools\.venv\lib\site-packages\nuitka\MainControl.py", line 767, in runSconsBackend
+    runScons(
+  File "E:\Code\Github\OpenPrepTools\.venv\lib\site-packages\nuitka\build\SconsInterface.py", line 403, in runScons
+    checkCachingSuccess(source_dir or options["source_dir"])
+  File "E:\Code\Github\OpenPrepTools\.venv\lib\site-packages\nuitka\build\SconsCaching.py", line 336, in checkCachingSuccess
+    stats = _getCcacheStatistics(ccache_logfile)
+  File "E:\Code\Github\OpenPrepTools\.venv\lib\site-packages\nuitka\build\SconsCaching.py", line 282, in _getCcacheStatistics
+    for line in getFileContentByLine(ccache_logfile, encoding="utf8"):
+  File "E:\Code\Github\OpenPrepTools\.venv\lib\site-packages\nuitka\utils\FileOperations.py", line 793, in getFileContentByLine
+    return getFileContents(filename, mode, encoding=encoding).splitlines()
+  File "E:\Code\Github\OpenPrepTools\.venv\lib\site-packages\nuitka\utils\FileOperations.py", line 811, in getFileContents
+    return f.read()
+  File "C:\Users\akaxy\AppData\Local\Programs\Python\Python39\lib\codecs.py", line 701, in read
+    return self.reader.read(size)
+  File "C:\Users\akaxy\AppData\Local\Programs\Python\Python39\lib\codecs.py", line 504, in read
+    newchars, decodedbytes = self.decode(data, self.errors)
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xc1 in position 76800: invalid start byte
+Nuitka-Reports: Compilation crash report written to file 'nuitka-crash-report.xml'. Please include it in your bug report.
+```
+请首先尝试清除缓存，使用命令`ccache -C`，或者更换指令
+```angular2html
+nuitka --standalone --mingw64 --output-dir=dist --enable-plugin=pyqt5 --windows-console-mode=disable --windows-icon-from-ico=logo_6.ico --disable-ccache PDF2Longimg.py
+```
+
 ## 运行界面展示
 
 ![PDF转长图](image/PDF转长图.png)
