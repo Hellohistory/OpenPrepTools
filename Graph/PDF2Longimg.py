@@ -25,7 +25,7 @@ class PDFToLongImageApp(QWidget):
 
         # 设置应用程序图标和版本号
         self.setWindowIcon(QIcon('logo_6.ico'))
-        self.setWindowTitle(f'PDF转长图程序 {self.VERSION}')
+        self.setWindowTitle(f'PDF转长图程序 {self.VERSION} (By Hellohistory)')
 
         self.init_ui()
         self.load_settings()

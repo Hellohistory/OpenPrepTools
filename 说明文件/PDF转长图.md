@@ -31,7 +31,13 @@ PDF转长图是一个基于 Python 和 PyQT 开发的图形用户界面应用程
 ``
 pip install nuitka
 ``
-2. 输入下面的命令
+
+2. 跳转到PDF2Longimg.py所在目录
+``
+cd Graph
+``
+
+3. 输入下面的命令
 ``
 nuitka --standalone --mingw64 --output-dir=dist --enable-plugin=pyqt5 --windows-console-mode=disable --windows-icon-from-ico=logo_6.ico PDF2Longimg.py
 ``
