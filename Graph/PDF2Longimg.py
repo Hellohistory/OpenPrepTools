@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-import tempfile  # 用于创建临时文件夹
+import tempfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import fitz  # PyMuPDF
@@ -14,21 +14,23 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QLabel, QPushBu
 
 
 class PDFToLongImageApp(QWidget):
+    VERSION = "v1.0.1"
+
     def __init__(self):
         super().__init__()
         self.pdf_files = []
         self.pdf_folders = []
         self.output_folder_path = ""
-        self.temp_dir = tempfile.mkdtemp()  # 创建临时文件夹
+        self.temp_dir = tempfile.mkdtemp()
 
-        # 设置应用程序图标
+        # 设置应用程序图标和版本号
         self.setWindowIcon(QIcon('logo_6.ico'))
+        self.setWindowTitle(f'PDF转长图程序 {self.VERSION}')
 
         self.init_ui()
         self.load_settings()
 
     def init_ui(self):
-        self.setWindowTitle('PDF转长图程序')
         self.setGeometry(200, 200, 600, 500)
 
         layout = QVBoxLayout()
@@ -37,9 +39,6 @@ class PDFToLongImageApp(QWidget):
         self.pdf_label = QLabel('未选择PDF文件或文件夹', self)
         self.pdf_label.setAlignment(Qt.AlignLeft)
         layout.addWidget(self.pdf_label)
-
-        self.progress = QProgressBar(self)
-        layout.addWidget(self.progress)
 
         # 文件选择控件
         file_select_layout = QHBoxLayout()
@@ -84,11 +83,21 @@ class PDFToLongImageApp(QWidget):
         self.log_text_edit.setReadOnly(True)
         layout.addWidget(self.log_text_edit)
 
+        # 进度条和按钮
+        self.progress_and_button_layout = QHBoxLayout()
+
+        # 进度条
+        self.progress = QProgressBar(self)
+        self.progress.setAlignment(Qt.AlignCenter)
+        self.progress_and_button_layout.addWidget(self.progress)
+
         # 开始转换按钮
         self.btn_start = QPushButton('开始转换', self)
         self.btn_start.setEnabled(False)
         self.btn_start.clicked.connect(self.batch_convert_pdf_to_image)
-        layout.addWidget(self.btn_start)
+        self.progress_and_button_layout.addWidget(self.btn_start)
+
+        layout.addLayout(self.progress_and_button_layout)
 
         self.setLayout(layout)
 
@@ -331,19 +340,27 @@ def extract_images_from_pdf(pdf_path, zoom_factor, temp_dir, log_func):
         pdf_doc = fitz.open(pdf_path)
         zoom_matrix = fitz.Matrix(zoom_factor, zoom_factor)
 
-        images = []
+        # 创建一个字典用于存储页面的图片路径和对应的页码
+        images_with_page_num = []
         with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
             futures = {
                 executor.submit(process_page, pdf_doc, page_num, zoom_matrix, temp_dir): page_num
                 for page_num in range(len(pdf_doc))}
             for future in as_completed(futures):
                 result = future.result()
+                page_num = futures[future]
                 if result:
-                    images.append(result)
+                    # 将页码和图片路径一起存储
+                    images_with_page_num.append((page_num, result))
                 else:
-                    log_func(f"页面 {futures[future]} 处理失败")
+                    log_func(f"页面 {page_num} 处理失败")
         log_func(f"文件处理完成: {pdf_path}")
-        return images
+
+        # 按页码排序
+        images_with_page_num.sort(key=lambda x: x[0])
+
+        # 只返回图片路径的列表
+        return [img_path for _, img_path in images_with_page_num]
     except Exception as e:
         log_func(f"处理PDF失败: {e}")
         return []
