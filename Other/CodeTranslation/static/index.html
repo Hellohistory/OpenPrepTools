@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>函数命名翻译工具</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 80px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        select, button {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            background-color: #ffffff;
+            color: #333;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        textarea {
+            width: 90%;
+            height: 200px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            resize: none;
+            background-color: #f9f9f9;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        .result-box {
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            bottom: 35px;
+            left: 10px;
+            background-color: #289ca7;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .copy-btn:hover {
+            background-color: #228d94;
+        }
+        .alert {
+            position: fixed;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            text-align: center;
+            font-size: 18px;
+            border-radius: 8px;
+            transition: top 0.5s ease, opacity 0.5s ease;
+            opacity: 0;
+            z-index: 1000;
+        }
+
+        #platform-icons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="alert" id="alert-box">已复制内容</div>
+<div id="platform-icons" class="platform-icons-style">
+    <a href="https://github.com/Hellohistory/OpenPrepTools" target="blank">
+        <img src="github-mark.svg" alt="GitHub" width="30" height="30" />
+    </a>
+    <a href="https://gitee.com/Hellohistory/OpenPrepTools" target="blank">
+        <img src="gitee-svgrepo-com.svg" alt="Gitee" width="30" height="30" />
+    </a>
+</div>
+<div class="container">
+    <div class="header">
+        <label for="lang-select"></label>
+        <select id="lang-select">
+            <option value="zh-en">中文 ——> 英语</option>
+            <option value="en-zh">英语 ——> 中文</option>
+        </select>
+        <label for="format-select"></label>
+        <select id="format-select">
+            <option value="snake_case">下划线命名（snake_case）</option>
+            <option value="camelCase">小驼峰命名（camelCase）</option>
+            <option value="PascalCase">大驼峰命名（PascalCase）</option>
+            <option value="CONSTANT_CASE">常量命名（CONSTANT_CASE）</option>
+            <option value="kebab-case">短横线命名（kebab-case）</option>
+            <option value="dot.case">点命名（dot.case）</option>
+            <option value="SCREAMING_SNAKE_CASE">大写下划线命名（SCREAMING_SNAKE_CASE）</option>
+            <option value="train-case">火车命名（train-case）</option>
+            <option value="UPPERCASE">全大写命名（UPPERCASE）</option>
+            <option value="lowercase">全小写命名（lowercase）</option>
+            <option value="Hungarian_Notation">匈牙利命名法（Hungarian_Notation）</option>
+            <option value="GreekCase">希腊命名（GreekCase）</option>
+            <option value="m_member_variable">成员变量命名（m_member_variable）</option>
+            <option value="Capitalized Words">单词首字母大写（Capitalized Words）</option>
+            <option value="Title Case">标题命名（Title Case）</option>
+            <option value="SNAKE_CASE">全大写下划线命名（SNAKE_CASE）</option>
+            <option value="SCREAMING_KEBAB_CASE">大写短横线命名（SCREAMING_KEBAB_CASE）</option>
+            <option value="path/case">路径命名（path/case）</option>
+            <option value="MixedCase">混合大小写命名（MixedCase）</option>
+            <option value="BacktickCase">反引号命名（BacktickCase）</option>
+            <option value="SuffixNotation">后缀命名（SuffixNotation）</option>
+            <option value="NumberedCamelCase">带编号的小驼峰命名（NumberedCamelCase）</option>
+            <option value="DotCaseWithTypeSuffix">点命名加类型后缀（DotCaseWithTypeSuffix）</option>
+            <option value="spaced-case">带空格命名（spaced-case）</option>
+            <option value="HashCase">井号命名（HashCase）</option>
+            <option value="DollarCase">美元符命名（DollarCase）</option>
+            <option value="TildeCase">波浪号命名（TildeCase）</option>
+            <option value="UnderscoreCamelCase">下划线小驼峰命名（UnderscoreCamelCase）</option>
+            <option value="AtSignCase">@符号命名（AtSignCase）</option>
+            <option value="ColonCase">冒号命名（ColonCase）</option>
+            <option value="AmpersandCase">&符号命名（AmpersandCase）</option>
+            <option value="PercentCase">百分号命名（PercentCase）</option>
+            <option value="ReversedWordsCase">倒序命名（ReversedWordsCase）</option>
+            <option value="SpaceCaseWithTypePrefix">带空格和类型前缀命名（SpaceCaseWithTypePrefix）</option>
+            <option value="BracketCase">括号命名（BracketCase）</option>
+            <option value="SlashCase">斜杠命名（SlashCase）</option>
+            <option value="PascalSnakeCase">大驼峰下划线命名（PascalSnakeCase）</option>
+            <option value="PlusCase">加号命名（PlusCase）</option>
+            <option value="CaretCase">插入符命名（CaretCase）</option>
+            <option value="AngleBracketCase">尖括号命名（AngleBracketCase）</option>
+            <option value="PoundCase">#号命名（PoundCase）</option>
+            <option value="NumberedSnakeCase">带编号的下划线命名（NumberedSnakeCase）</option>
+            <option value="ExclamationCase">感叹号命名（ExclamationCase）</option>
+        </select>
+        <button id="translate-button">翻译</button>
+    </div>
+
+    <label for="input-text"></label><textarea id="input-text" placeholder="请输入你要翻译的文字"></textarea>
+
+    <div class="result-box">
+        <label for="output-text"></label><textarea id="output-text" readonly placeholder="翻译结果会显示在这里"></textarea>
+        <button class="copy-btn" onclick="copyText()">复制</button>
+    </div>
+</div>
+
+<script>
+    let cachedNames = null;
+
+    document.getElementById('translate-button').addEventListener('click', async function () {
+        const content = document.getElementById('input-text').value;
+        const lang = document.getElementById('lang-select').value;
+        const fromLang = lang === 'zh-en' ? 'zh' : 'en';
+        const toLang = lang === 'zh-en' ? 'en' : 'zh';
+
+        if (!content) {
+            alert("请输入内容");
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:36920/generate_name', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    content: content,
+                    from_lang: fromLang,
+                    to_lang: toLang
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                if (lang === 'zh-en') {
+                    cachedNames = data.formatted_names;
+                    const format = document.getElementById('format-select').value;
+                    document.getElementById('output-text').value = cachedNames[format] || '无结果';
+                } else {
+                    document.getElementById('output-text').value = data.translated_name || '无结果';
+                }
+            } else {
+                alert("请求失败，状态码: " + response.status);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert("请求失败");
+        }
+    });
+
+    document.getElementById('format-select').addEventListener('change', function () {
+        if (cachedNames) {
+            const format = document.getElementById('format-select').value;
+            document.getElementById('output-text').value = cachedNames[format] || '无结果';
+        }
+    });
+
+    document.getElementById('lang-select').addEventListener('change', function () {
+        const lang = document.getElementById('lang-select').value;
+        const formatSelect = document.getElementById('format-select');
+        if (lang === 'zh-en') {
+            formatSelect.style.display = 'inline-block';
+        } else {
+            formatSelect.style.display = 'none';
+        }
+    });
+
+    document.getElementById('input-text').addEventListener('input', function () {
+        const content = document.getElementById('input-text').value;
+        if (!content) {
+            document.getElementById('output-text').value = '';
+        }
+    });
+
+    function copyText() {
+        const outputText = document.getElementById('output-text');
+        outputText.select();
+        document.execCommand('copy');
+
+        const alertBox = document.getElementById('alert-box');
+        alertBox.classList.add('show');
+
+        setTimeout(function () {
+            alertBox.classList.remove('show');
+        }, 3000);
+    }
+</script>
+
+</body>
+</html>

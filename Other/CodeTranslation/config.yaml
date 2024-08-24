@@ -1,0 +1,10 @@
+# config.yaml
+
+# 百度翻译官方API配置
+baidu:
+  appid: ""
+  secret_key: ""
+
+# 翻译源设置
+# 可选值：baidu_official(百度官方API), baidu_free(百度第三方), youdao_free(有道第三方)
+default_translation_source: "youdao_free"
