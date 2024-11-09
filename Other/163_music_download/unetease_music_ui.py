@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 
 import requests
 from PyQt5 import QtWidgets, QtGui, QtCore
@@ -29,16 +29,16 @@ class MusicInfoApp(QtWidgets.QWidget):
         self.init_ui()
 
     def init_ui(self):
-        self.setWindowTitle("网易云音乐工具")
+        self.setWindowTitle("网易云单曲下载工具")
         self.setGeometry(100, 100, 900, 600)
         self.setStyleSheet("background-color: #2E2E2E; color: #FFFFFF;")
-        self.setWindowIcon(QtGui.QIcon("music_icon.png"))
+        self.setWindowIcon(QtGui.QIcon("163.ico"))
 
         main_layout = QtWidgets.QHBoxLayout(self)
 
         left_layout = QtWidgets.QVBoxLayout()
 
-        title_label = QtWidgets.QLabel("网易云音乐工具", self)
+        title_label = QtWidgets.QLabel("网易云单曲下载工具", self)
         title_label.setFont(QtGui.QFont("Helvetica", 22, QtGui.QFont.Bold))
         title_label.setStyleSheet("color: #1DB954; margin-bottom: 20px;")
         title_label.setAlignment(QtCore.Qt.AlignCenter)
@@ -50,11 +50,7 @@ class MusicInfoApp(QtWidgets.QWidget):
         self.song_id_input = QtWidgets.QLineEdit(song_id_card)
         self.song_id_input.setPlaceholderText("请输入歌曲ID")
         self.song_id_input.setStyleSheet("background-color: #404040; color: #FFFFFF; border-radius: 5px; padding: 5px;")
-        self.fetch_button = QtWidgets.QPushButton("获取歌曲信息", song_id_card)
-        self.fetch_button.setStyleSheet(
-            "background-color: #1DB954; color: white; border-radius: 5px; padding: 8px 15px;")
         song_id_layout.addWidget(self.song_id_input)
-        song_id_layout.addWidget(self.fetch_button)
         left_layout.addWidget(song_id_card)
 
         quality_cookie_card = QtWidgets.QGroupBox("音质选择与Cookie输入", self)
@@ -69,7 +65,7 @@ class MusicInfoApp(QtWidgets.QWidget):
         self.cookie_input.setEchoMode(QtWidgets.QLineEdit.Password)
         self.cookie_input.setStyleSheet("background-color: #404040; color: #FFFFFF; border-radius: 5px; padding: 5px;")
         quality_cookie_layout.addRow("请选择音质级别：", self.level_input)
-        quality_cookie_layout.addRow("请输入MUSIC_U（可选）：", self.cookie_input)
+        quality_cookie_layout.addRow("请输入MUSIC_U：", self.cookie_input)
         left_layout.addWidget(quality_cookie_card)
 
         song_info_card = QtWidgets.QGroupBox("歌曲信息", self)
@@ -100,9 +96,22 @@ class MusicInfoApp(QtWidgets.QWidget):
         lyrics_layout.addWidget(self.lyrics_text)
         main_layout.addWidget(lyrics_card)
 
+        links_layout = QtWidgets.QHBoxLayout()
+        github_label = QtWidgets.QLabel("<a href='https://github.com/Hellohistory/OpenPrepTools'>GitHub地址</a>", self)
+        github_label.setStyleSheet("color: #1DB954; margin-top: 20px;")
+        github_label.setOpenExternalLinks(True)
+        links_layout.addWidget(github_label)
+
+        gitee_label = QtWidgets.QLabel("<a href='https://gitee.com/Hellohistory/OpenPrepTools'>Gitee地址</a>", self)
+        gitee_label.setStyleSheet("color: #1DB954; margin-top: 20px; margin-left: 20px;")
+        gitee_label.setOpenExternalLinks(True)
+        links_layout.addWidget(gitee_label)
+
+        left_layout.addLayout(links_layout)
+
         self.setLayout(main_layout)
 
-        self.fetch_button.clicked.connect(self.fetch_song_info)
+        self.song_id_input.textChanged.connect(self.on_song_id_changed)  # 设置这里的文本变化事件
         self.download_button.clicked.connect(self.download_song_action)
 
         self.auto_load_cookie()
@@ -111,6 +120,11 @@ class MusicInfoApp(QtWidgets.QWidget):
         cookie = load_cookie()
         if cookie and "MUSIC_U" in cookie:
             self.cookie_input.setText(cookie["MUSIC_U"])
+
+    def on_song_id_changed(self):
+        song_id = self.song_id_input.text()
+        if len(song_id) == 7 and song_id.isdigit():
+            self.fetch_song_info()
 
     def fetch_song_info(self):
         song_id = self.song_id_input.text()
@@ -160,7 +174,6 @@ class MusicInfoApp(QtWidgets.QWidget):
             QtWidgets.QMessageBox.critical(self, "错误", "无法下载歌曲，请先获取歌曲信息！")
 
 
-# 示例调用
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     music_info_app = MusicInfoApp()

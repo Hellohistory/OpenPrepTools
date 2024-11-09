@@ -16,7 +16,9 @@ OpenPrepTools 项目提供了一系列工具，帮助用户高效进行数据预
 | 0004 | 一次性密码生成     | 用于生成一次性密码，并且实现检测密码强度        | [Safe_Code](Other/Safe_Code)                   | [一次性密码生成.md](说明文件/一次性密码生成.md)     |
 | 0005 | PDF转长图      | 用于将PDF文件转换为长图               | [PDF2Longimg.py](Graph/PDF2Longimg.py)         | [PDF转长图.md](说明文件/PDF转长图.md)       |
 | 0006 | 灰度图片转黑白图片   | 用于将灰度图片转换为黑白图片              | [Gray2BlackWhite.py](Graph/Gray2BlackWhite.py) | [灰度图片转黑白图片.md](说明文件/灰度图片转黑白图片.md) |                                         |                                                        |                                          |
-| 0007 | 代码变量函数名翻译工具 | 翻译为常见命名规范    | [DeveloperTools](Other/CodeTranslation)                                           | [代码变量函数名翻译工具.md](说明文件/代码变量函数名翻译工具.md)                              |
+| 0007 | 代码变量函数名翻译工具 | 翻译为常见命名规范                   | [DeveloperTools](Other/CodeTranslation)                                           | [代码变量函数名翻译工具.md](说明文件/代码变量函数名翻译工具.md)                              |
+| 0008 | 网易云单曲下载工具   | 下载网易云单曲                     | [163_music_download](Other/163_music_download)                                           | [代码变量函数名翻译工具.md](说明文件/网易云单曲下载工具.md)                              |
+
 
 ### 使用说明
 
