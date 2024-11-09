@@ -38,3 +38,4 @@ lxml>=5.3.0
 loguru>=0.7.2
 cx_Freeze
 cryptography
+httpx
