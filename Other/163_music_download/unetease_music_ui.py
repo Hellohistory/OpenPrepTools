@@ -1,6 +1,5 @@
 import os
 import sys
-
 import requests
 from PyQt5 import QtWidgets, QtGui, QtCore
 from netease_music_core import url_v1, name_v1, lyric_v1, save_cookie, load_cookie
@@ -27,6 +26,14 @@ class MusicInfoApp(QtWidgets.QWidget):
         self.song_url = None
         self.song_name = None
         self.init_ui()
+
+        # 创建一个定时器用于延迟处理ID输入
+        self.id_input_timer = QtCore.QTimer()
+        self.id_input_timer.setSingleShot(True)
+        self.id_input_timer.timeout.connect(self.fetch_song_info)
+
+    def on_song_id_changed(self):
+        self.id_input_timer.start(1000)
 
     def init_ui(self):
         self.setWindowTitle("网易云单曲下载工具")
@@ -111,8 +118,10 @@ class MusicInfoApp(QtWidgets.QWidget):
 
         self.setLayout(main_layout)
 
-        self.song_id_input.textChanged.connect(self.on_song_id_changed)  # 设置这里的文本变化事件
+        self.song_id_input.textChanged.connect(self.on_song_id_changed)
         self.download_button.clicked.connect(self.download_song_action)
+
+        self.level_input.currentIndexChanged.connect(self.fetch_song_info)
 
         self.auto_load_cookie()
 
@@ -120,11 +129,6 @@ class MusicInfoApp(QtWidgets.QWidget):
         cookie = load_cookie()
         if cookie and "MUSIC_U" in cookie:
             self.cookie_input.setText(cookie["MUSIC_U"])
-
-    def on_song_id_changed(self):
-        song_id = self.song_id_input.text()
-        if len(song_id) == 7 and song_id.isdigit():
-            self.fetch_song_info()
 
     def fetch_song_info(self):
         song_id = self.song_id_input.text()
@@ -134,7 +138,6 @@ class MusicInfoApp(QtWidgets.QWidget):
 
         level = self.level_input.currentText().split()[0]
 
-        # 处理 MUSIC_U Cookie
         music_u = self.cookie_input.text().strip()
         cookies = {
             "os": "pc",
