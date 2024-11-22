@@ -1,8 +1,14 @@
 import os
 import sys
+import re
 import requests
 from PyQt5 import QtWidgets, QtGui, QtCore
 from netease_music_core import url_v1, name_v1, lyric_v1, save_cookie, load_cookie
+
+
+def sanitize_filename(filename):
+    # 去掉 Windows 不允许的特殊字符
+    return re.sub(r'[\\/:*?"<>|]', '', filename)
 
 
 def download_song(song_url, song_name):
@@ -10,12 +16,13 @@ def download_song(song_url, song_name):
         if not os.path.exists("download"):
             os.makedirs("download")
 
+        sanitized_song_name = sanitize_filename(song_name)
         response = requests.get(song_url, stream=True)
         response.raise_for_status()
-        with open(os.path.join("download", f"{song_name}.flac"), "wb") as f:
+        with open(os.path.join("download", f"{sanitized_song_name}.flac"), "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
-        QtWidgets.QMessageBox.information(None, "成功", f"歌曲已成功下载：download/{song_name}.flac")
+        QtWidgets.QMessageBox.information(None, "成功", f"歌曲已成功下载：download/{sanitized_song_name}.flac")
     except Exception as e:
         QtWidgets.QMessageBox.critical(None, "错误", f"下载失败: {str(e)}")
 
@@ -156,7 +163,7 @@ class MusicInfoApp(QtWidgets.QWidget):
 
             if 'data' in url_info and url_info['data'][0]['url']:
                 self.song_url = url_info['data'][0]['url']
-                self.song_name = song_info['songs'][0]['name']
+                self.song_name = sanitize_filename(song_info['songs'][0]['name'])
                 song_lyrics = lyric_info.get('lrc', {}).get('lyric', '无歌词')
                 result = f"歌曲名称: {self.song_name}\n歌曲链接: {self.song_url}"
                 self.result_text.setText(result)
