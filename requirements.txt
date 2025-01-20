@@ -39,3 +39,4 @@ loguru>=0.7.2
 cx_Freeze
 cryptography
 httpx
+pycryptodome
