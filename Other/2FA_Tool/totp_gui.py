@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QWidget, QMessageBox, QInputDialog, QLineEdit, QFileDialog, QDialog,
     QLabel, QFormLayout, QAction, QPushButton, QHBoxLayout, QHeaderView,
-    QGraphicsDropShadowEffect
+    QGraphicsDropShadowEffect, QMenu
 )
 
 from secure_totp_manager_core import SecureTOTPManager
@@ -118,7 +118,6 @@ class SecureTOTPManagerGUI(QMainWindow):
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.setFocusPolicy(Qt.NoFocus)
         self.table.setSortingEnabled(True)
-
         self.table.setSelectionMode(QTableWidget.MultiSelection)
 
         # 列宽设置
@@ -127,6 +126,10 @@ class SecureTOTPManagerGUI(QMainWindow):
         self.table.setColumnWidth(2, 160)
         self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
         self.table.horizontalHeader().setDefaultAlignment(Qt.AlignLeft)
+
+        # 将双击信号与复制槽函数连接
+        # 注意：cellDoubleClicked(int row, int column)
+        self.table.cellDoubleClicked.connect(self.on_cell_double_clicked)
 
         # 主布局
         main_layout = QVBoxLayout()
@@ -143,6 +146,21 @@ class SecureTOTPManagerGUI(QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_totps)
         self.timer.start(1000)
+
+    def on_cell_double_clicked(self, row, column):
+        """
+        当表格单元格被双击时触发的槽函数。
+        在这里判断是否为「验证码」列，如果是，就把对应验证码复制到剪贴板。
+        """
+        # 这里的column == 1，代表第二列「当前验证码」
+        if column == 1:
+            code_item = self.table.item(row, column)
+            if code_item:
+                code_text = code_item.text()
+                # 将文本复制到剪贴板
+                QApplication.clipboard().setText(code_text)
+                # 弹出提示（可用QMessageBox，也可使用状态栏提示）
+                QMessageBox.information(self, "提示", "验证码已复制到剪贴板！")
 
     def import_secrets(self):
         """从加密文件导入密钥"""
@@ -349,8 +367,8 @@ class SecureTOTPManagerGUI(QMainWindow):
 
             # 密钥名称
             name_item = QTableWidgetItem(name)
-            # 用 UserRole 存储真正的 secret 值，方便其他地方直接获取
             name_item.setData(Qt.UserRole, secret)
+            name_item.setTextAlignment(Qt.AlignCenter)
             self.table.setItem(row, 0, name_item)
 
             # 验证码和剩余时间
