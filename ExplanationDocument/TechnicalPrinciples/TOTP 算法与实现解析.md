@@ -146,9 +146,3 @@ class TOTP:
         except Exception:  
             raise ValueError("无效的 Base32 密钥")
 ```
-
-## 6.相关链接
-
-- **软件下载与介绍**：[https://www.52pojie.cn/thread-2001420-1-1.html](https://www.52pojie.cn/thread-2001420-1-1.html)
-- **GitHub**: [https://github.com/Hellohistory/OpenPrepTools](https://github.com/Hellohistory/OpenPrepTools)
-- **Gitee**: [https://gitee.com/Hellohistory/OpenPrepTools](https://gitee.com/Hellohistory/OpenPrepTools)
