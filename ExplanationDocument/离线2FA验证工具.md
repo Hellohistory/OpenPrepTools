@@ -21,6 +21,8 @@ nuitka --standalone --mingw64 --output-dir=dist --enable-plugin=pyqt5 --windows-
 
 - [GitHub 地址](https://github.com/Hellohistory/OpenPrepTools)  
 - [Gitee 地址](https://gitee.com/Hellohistory/OpenPrepTools)  
+
+## [技术原理说明](TechnicalPrinciples/TOTP%20算法与实现解析.md)
   
 ## 最后说明  
 
