@@ -1,0 +1,2 @@
+nuitka --standalone --msvc=latest --output-dir=dist --enable-plugin=pyside6 --include-qt-plugins=platforms,imageformats,styles --windows-console-mode=disable --windows-icon-from-ico=resources/logo.ico app.py
+# 

@@ -1,0 +1,48 @@
+/* style.qss — 全局样式 */
+* {
+    font-family: "Microsoft YaHei", "PingFang SC", "Sans-serif";
+    font-size: 14px;
+}
+
+QMainWindow {
+    background: #fafafa;
+}
+
+QLineEdit {
+    padding: 6px;
+    border: 1px solid #c0c0c0;
+    border-radius: 4px;
+}
+
+QPushButton {
+    padding: 6px 14px;
+    background: #1e88e5;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+QPushButton:hover {
+    background: #1565c0;
+}
+QPushButton:pressed {
+    background: #0d47a1;
+}
+
+/* 表格边框 */
+QTableWidget {
+    border: 1px solid #e0e0e0;
+}
+
+/* 表头 */
+QHeaderView::section {
+    padding: 4px;
+    background: #eeeeee;
+    border: 1px solid #d0d0d0;
+}
+
+/* 深色选中效果 */
+QTableView::item:selected,
+QTableWidget::item:selected {
+    background: #1565c0;
+    color: white;
+}

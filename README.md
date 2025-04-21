@@ -16,7 +16,7 @@ OpenPrepTools 项目提供了一系列工具，帮助用户高效进行数据预
 | 0004 | 一次性密码生成     | 用于生成一次性密码，并且实现检测密码强度        | [Safe_Code](Other/Safe_Code)                         | [一次性密码生成.md](ExplanationDocument/一次性密码生成.md)        |
 | 0005 | PDF转长图      | 用于将PDF文件转换为长图               | [PDF2Longimg.py](Graph/PDF2Longimg.py)               | [PDF转长图.md](ExplanationDocument/PDF转长图.md)          |
 | 0006 | 灰度图片转黑白图片   | 用于将灰度图片转换为黑白图片              | [Gray2BlackWhite.py](Graph/Gray2BlackWhite.py)       | [灰度图片转黑白图片.md](ExplanationDocument/灰度图片转黑白图片.md)    |
-| 0007 | 代码变量函数名翻译工具 | 翻译为常见命名规范                   | [DeveloperTools](Other/CodeTranslation)              | [代码变量函数名翻译工具.md](ExplanationDocument/代码变量函数名翻译工具.md) |
+| 0007 | 代码变量函数名翻译工具 | 翻译为常见命名规范                   | [DeveloperTools](Code/CodeTranslation)              | [代码变量函数名翻译工具.md](ExplanationDocument/代码变量函数名翻译工具.md) |
 | 0008 | 网易云单曲下载工具   | 下载网易云单曲                     | [163_music_download](Other/163_music_download)       | [代码变量函数名翻译工具.md](ExplanationDocument/网易云单曲下载工具.md)  |
 | 0009 | 万能视频下载器     | 支持多种视频网站视频下载，支持批量下载         | [UniversalVideoDownloader](Downloader/UniversalVideoDownloader) | [万能视频下载器.md](ExplanationDocument/万能视频下载器.md)|
 | 0010 | 离线2FA验证工具     | 离线生成2FA验证码     | [2FA_Tool](Other/2FA_Tool) | [离线2FA验证工具.md](ExplanationDocument/离线2FA验证工具.md)|
