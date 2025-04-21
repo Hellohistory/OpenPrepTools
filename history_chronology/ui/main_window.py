@@ -37,8 +37,8 @@ from ui.widgets.copyable_table_widget import CopyableTableWidget
 YEAR_MIN, YEAR_MAX = config.YEAR_MIN, config.YEAR_MAX
 
 # 关于对话框里的仓库地址
-GITHUB_URL = "https://github.com/yourname/yourrepo"
-GITEE_URL = "https://gitee.com/yourname/yourrepo"
+GITHUB_URL = "https://github.com/Hellohistory/OpenPrepTools"
+GITEE_URL = "https://gitee.com/Hellohistory/OpenPrepTools"
 
 
 class MainWindow(QMainWindow):
