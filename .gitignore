@@ -5,3 +5,6 @@
 /dist/0005_20240817.zip
 /dist/0006_20240822.exe
 /dist/PDF转长图 V1.0.1.zip
+# 忽略所有 __pycache__ 目录及其 .pyc
+__pycache__/
+*.py[cod]
