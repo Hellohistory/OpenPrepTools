@@ -22,7 +22,9 @@ from PySide6.QtWidgets import (
     QTableWidgetItem,
     QToolTip,
     QVBoxLayout,
-    QWidget, QDialog,
+    QWidget,
+    QDialog,
+    QAbstractItemView,  # 用于设置表格只读
 )
 
 from data.repository import ChronologyRepository
@@ -46,7 +48,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self, db_path: str, parent=None) -> None:
         super().__init__(parent)
-        self.setWindowTitle(f"中华甲子历史年表")
+        self.setWindowTitle("中华甲子历史年表")
 
         # 数据层与业务层初始化
         repo = ChronologyRepository(db_path)
@@ -187,8 +189,10 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(root)
 
     def _create_table(self) -> CopyableTableWidget:
-        """初始化表格，设置表头提示、右键菜单策略"""
+        """初始化表格，设置表头、只读模式和右键菜单策略"""
         tbl = CopyableTableWidget(columnCount=8)
+        # 禁止编辑：用户只能选中和复制，不能修改
+        tbl.setEditTriggers(QAbstractItemView.NoEditTriggers)
         tbl.setHorizontalHeaderLabels(
             ["公元", "干支", "时期", "政权", "帝号", "帝名", "年号", "在位年"]
         )

@@ -51,6 +51,10 @@ class AdvancedSearchDialog(QDialog):
         ylayout.addWidget(self.year_to)
         form.addRow("公元区间：", ylayout)
 
+        # — 干支关键字 —
+        self.ganzhi = QLineEdit()
+        form.addRow("干支：", self.ganzhi)
+
         # — 文本条件 —
         self.period = QLineEdit()
         self.regime = QLineEdit()
@@ -92,6 +96,7 @@ class AdvancedSearchDialog(QDialog):
         return {
             "year_from": spin_val(self.year_from),
             "year_to": spin_val(self.year_to),
+            "ganzhi": text_or_none(self.ganzhi),
             "period": text_or_none(self.period),
             "regime": text_or_none(self.regime),
             "emperor_title": text_or_none(self.emperor_title),

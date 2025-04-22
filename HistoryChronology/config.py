@@ -5,7 +5,7 @@
 from pathlib import Path
 
 # 本地数据库路径
-DB_PATH: Path = Path(__file__).parent / "History_Chronology.db"
+DB_PATH: Path = Path(__file__).parent / "resources" / "History_Chronology.db"
 
 # 远程数据库下载地址
 REMOTE_DB_URL: str = "https://github.com/Hellohistory/OpenPrepTools/blob/master/history_chronology/History_Chronology.db"
