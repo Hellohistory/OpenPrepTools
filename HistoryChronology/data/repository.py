@@ -76,10 +76,11 @@ class ChronologyRepository:
     def search_entries(self, keyword: str) -> List[HistoryEntry]:
         """
         根据关键字模糊查询，支持简繁体互转
-        查询字段：帝号、帝名、年号、时期、政权
+        查询字段：干支、帝号、帝名、年号、时期、政权
         """
         variants = self._generate_variants(keyword)
-        text_cols = ["帝号", "帝名", "年号", "时期", "政权"]
+        # 在原有字段基础上加入“干支”
+        text_cols = ["干支", "帝号", "帝名", "年号", "时期", "政权"]
         conditions: List[str] = []
         params: List[str] = []
 
@@ -105,6 +106,7 @@ class ChronologyRepository:
         *,
         year_from: Optional[int] = None,
         year_to: Optional[int] = None,
+        ganzhi: str | None = None,
         period: str | None = None,
         regime: str | None = None,
         emperor_title: str | None = None,
@@ -113,6 +115,7 @@ class ChronologyRepository:
     ) -> List[HistoryEntry]:
         """
         多条件组合查询，所有文本条件均支持简繁体互转
+        支持字段：公元区间、干支、时期、政权、帝号、帝名、年号
         """
         conditions: List[str] = []
         params: List = []
@@ -131,6 +134,10 @@ class ChronologyRepository:
                 conditions.append(f"{col} LIKE ?")
                 params.append(f"%{variant}%")
 
+        # 干支关键字
+        if ganzhi:
+            add_text_condition("干支", ganzhi)
+        # 其它文本关键词
         if period:
             add_text_condition("时期", period)
         if regime:
