@@ -10,7 +10,7 @@ import requests
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 
-from ui.main_window import MainWindow
+from main_window import MainWindow
 import config
 
 
@@ -39,7 +39,7 @@ def main() -> None:
     else:
         print(f"警告：应用图标文件未找到：{icon_path}")
 
-    qss_path = config.STYLE_QSS
+    qss_path = config.LIGHT_STYLE_QSS
     if qss_path.exists():
         app.setStyleSheet(qss_path.read_text(encoding="utf-8"))
 

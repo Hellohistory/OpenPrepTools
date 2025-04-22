@@ -1,0 +1,45 @@
+/* style_solarized.qss — Solarized Light 主题 */
+* {
+    font-family: "Microsoft YaHei", "PingFang SC", "Sans-serif";
+    font-size: 14px;
+    color: #657b83; /* base00 */
+    background-color: #fdf6e3; /* base3 */
+}
+
+QMainWindow { background: #fdf6e3; }
+
+QLineEdit {
+    padding: 6px;
+    border: 1px solid #93a1a1; /* base1 */
+    border-radius: 4px;
+    background: #eee8d5; /* base2 */
+    color: #657b83;
+}
+
+QPushButton {
+    padding: 6px 14px;
+    background: #268bd2; /* blue */
+    color: #fdf6e3;
+    border: none;
+    border-radius: 4px;
+}
+QPushButton:hover { background: #2aa198; } /* cyan */
+QPushButton:pressed { background: #859900; } /* green */
+
+QTableWidget {
+    border: 1px solid #93a1a1;
+    background: #fdf6e3;
+    color: #657b83;
+}
+QHeaderView::section {
+    padding: 4px;
+    background: #93a1a1;
+    color: #fdf6e3;
+    border: 1px solid #93a1a1;
+}
+
+QTableView::item:selected,
+QTableWidget::item:selected {
+    background: #b58900; /* yellow */
+    color: #fdf6e3;
+}

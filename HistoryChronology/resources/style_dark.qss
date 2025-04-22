@@ -1,0 +1,55 @@
+/* style_dark.qss — 黑暗主题 */
+
+* {
+    font-family: "Microsoft YaHei", "PingFang SC", "Sans-serif";
+    font-size: 14px;
+    color: #dddddd;
+    background-color: #2b2b2b;
+}
+
+QMainWindow {
+    background: #3c3f41;
+}
+
+QLineEdit {
+    padding: 6px;
+    border: 1px solid #6c6c6c;
+    border-radius: 4px;
+    background: #45494a;
+    color: #dddddd;
+}
+
+QPushButton {
+    padding: 6px 14px;
+    background: #5c6166;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+}
+QPushButton:hover {
+    background: #6c6c6c;
+}
+QPushButton:pressed {
+    background: #7d7d7d;
+}
+
+QTableWidget {
+    border: 1px solid #6c6c6c;
+    background: #2b2b2b;
+    gridline-color: #555555;
+    color: #dddddd;
+}
+
+QHeaderView::section {
+    padding: 4px;
+    background: #3c3f41;
+    border: 1px solid #6c6c6c;
+    color: #ffffff;
+}
+
+/* 深色选中效果 */
+QTableView::item:selected,
+QTableWidget::item:selected {
+    background: #5b8dbf;
+    color: white;
+}
