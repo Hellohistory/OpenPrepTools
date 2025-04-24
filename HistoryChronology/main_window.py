@@ -8,8 +8,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import List
 
-from PySide6.QtCore import Qt, QPoint
-from PySide6.QtGui import QCursor, QAction, QPixmap
+from PySide6.QtCore import Qt, QPoint, QSettings
+from PySide6.QtGui import QCursor, QAction
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -24,16 +24,15 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
     QDialog,
-    QAbstractItemView,  # 用于设置表格只读
+    QAbstractItemView,
 )
 
+import config
 from data.repository import ChronologyRepository
 from models.history_entry import HistoryEntry
 from services.chronology_service import ChronologyService
 from ui.dialogs.advanced_search_dialog import AdvancedSearchDialog
 from ui.widgets.copyable_table_widget import CopyableTableWidget
-import config
-
 
 # 允许查询的年份上下限
 YEAR_MIN, YEAR_MAX = config.YEAR_MIN, config.YEAR_MAX
@@ -50,6 +49,9 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.setWindowTitle("中华甲子历史年表")
 
+        # 初始化设置存储，用于记住用户上次选择的主题
+        self.settings = QSettings("Hellohistory", "OpenPrepTools")
+
         # 数据层与业务层初始化
         repo = ChronologyRepository(db_path)
         self._svc = ChronologyService(repo)
@@ -58,8 +60,10 @@ class MainWindow(QMainWindow):
         self._create_menu()
         self._build_ui()
 
-        # 启动时默认应用浅色主题
-        self._apply_theme(config.LIGHT_STYLE_QSS)
+        # 启动时从设置中加载上次主题，如果不存在则使用浅色主题
+        theme_path_str = self.settings.value("theme", str(config.LIGHT_STYLE_QSS))
+        theme_path = Path(theme_path_str)
+        self._apply_theme(theme_path)
 
     def _create_menu(self) -> None:
         """创建菜单栏：文件、视图、帮助"""
@@ -102,12 +106,15 @@ class MainWindow(QMainWindow):
     def _apply_theme(self, qss_path: Path) -> None:
         """
         应用指定的 QSS 样式表，强制使用 Fusion 样式以避免系统主题干扰
+        并将所选主题保存到设置，下次启动时自动加载
         :param qss_path: 样式表文件路径
         """
         app = QApplication.instance()
         app.setStyle("Fusion")
         if qss_path.exists():
             app.setStyleSheet(qss_path.read_text(encoding="utf-8"))
+            # 保存到 QSettings，下次启动时加载
+            self.settings.setValue("theme", str(qss_path))
         else:
             print(f"警告：未找到主题文件 {qss_path}")
 
@@ -117,6 +124,8 @@ class MainWindow(QMainWindow):
         msg.setWindowTitle("关于")
         msg.setTextFormat(Qt.RichText)
         msg.setText(
+            f"<p><b>作者：</b>Hellohistory</p>"
+            f"<p><b>版本号：</b>v1.2</p>"
             f"<p><b>GitHub：</b>"
             f"<a href='{GITHUB_URL}'>{GITHUB_URL}</a></p>"
             f"<p><b>Gitee：</b>"
@@ -132,18 +141,11 @@ class MainWindow(QMainWindow):
         msg.setTextFormat(Qt.RichText)
         html = (
             "<h2>特别感谢</h2>"
-            "<p>感谢 <b>经世国学馆 耕田四哥</b>！</p>"
+            "<p>感谢 <b>经世国学馆 耕田四哥</b>！</p>"
             "<p>如果没有四哥所制作的 <i>中华甲子历史年表</i>，本项目不可能诞生。</p>"
             "<p><b>特别声明：</b>本人与经世国学馆无任何关联，仅怀揣学习之心编写此项目。</p>"
-            "<p>扫码关注公众号：</p>"
         )
         msg.setText(html)
-
-        qr_path = Path(__file__).parent / "resources" / "经世国学馆公众号二维码.png"
-        pixmap = QPixmap(str(qr_path))
-        if not pixmap.isNull():
-            msg.setIconPixmap(pixmap)
-
         msg.setStandardButtons(QMessageBox.Ok)
         msg.exec()
 
@@ -191,7 +193,6 @@ class MainWindow(QMainWindow):
     def _create_table(self) -> CopyableTableWidget:
         """初始化表格，设置表头、只读模式和右键菜单策略"""
         tbl = CopyableTableWidget(columnCount=8)
-        # 禁止编辑：用户只能选中和复制，不能修改
         tbl.setEditTriggers(QAbstractItemView.NoEditTriggers)
         tbl.setHorizontalHeaderLabels(
             ["公元", "干支", "时期", "政权", "帝号", "帝名", "年号", "在位年"]
