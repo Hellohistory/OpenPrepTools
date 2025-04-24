@@ -8,7 +8,7 @@ from pathlib import Path
 DB_PATH: Path = Path(__file__).parent / "resources" / "History_Chronology.db"
 
 # 远程数据库下载地址
-REMOTE_DB_URL: str = "https://github.com/Hellohistory/OpenPrepTools/blob/master/history_chronology/History_Chronology.db"
+REMOTE_DB_URL: str = "https://github.com/Hellohistory/OpenPrepTools/blob/master/history_chronology/resources/History_Chronology.db"
 
 # 支持的年份上下限
 YEAR_MIN: int = -841
