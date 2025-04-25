@@ -358,7 +358,7 @@ class SecureTOTPManagerGUI(QMainWindow):
           <li>跨平台支持</li>
         </ul>
         <hr>
-        <p>协议：核心 MIT 开源，GUI 部分 LGPL协议</p>
+        <p>协议：核心 MIT 开源，GUI 部分 LGPL 协议</p>
         <p>源码：<a href="https://github.com/Hellohistory/OpenPrepTools">GitHub</a>
          或 <a href="https://gitee.com/Hellohistory/OpenPrepTools">Gitee</a></p>
         """
