@@ -1,20 +1,31 @@
 import sys
 import time
+from functools import partial
 
-from PyQt5.QtCore import (
-    QTimer, Qt
-)
-from PyQt5.QtGui import (
-    QIcon, QColor, QFont, QPixmap
-)
-from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QVBoxLayout, QTableWidget, QTableWidgetItem,
-    QWidget, QMessageBox, QInputDialog, QLineEdit, QFileDialog, QDialog,
-    QLabel, QFormLayout, QAction, QPushButton, QHBoxLayout, QHeaderView,
-    QGraphicsDropShadowEffect, QMenu
+from PySide6.QtCore import QTimer, Qt
+from PySide6.QtGui import QIcon, QColor, QFont, QPixmap
+from PySide6.QtGui import QAction
+from PySide6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QVBoxLayout,
+    QTableWidget,
+    QTableWidgetItem,
+    QWidget,
+    QMessageBox,
+    QInputDialog,
+    QLineEdit,
+    QFileDialog,
+    QDialog,
+    QLabel,
+    QFormLayout,
+    QPushButton,
+    QHBoxLayout,
+    QHeaderView,
+    QGraphicsDropShadowEffect
 )
 
-from secure_totp_manager_core import SecureTOTPManager
+from secure_totp_manager_core import SecureTOTPManager, export_specific_secrets
 from totp_core import TOTP
 
 
@@ -28,19 +39,16 @@ class SecretDetailsDialog(QDialog):
         self.resize(480, 220)
         self.save_callback = save_callback
 
-        # 主布局
         layout = QFormLayout()
         layout.setContentsMargins(24, 24, 24, 24)
         layout.setVerticalSpacing(16)
         layout.setHorizontalSpacing(20)
 
-        # 输入框
         self.name_input = QLineEdit(name)
         self.secret_input = QLineEdit(secret)
         self.secret_input.setFont(QFont("Consolas", 12))
 
-        # 添加阴影效果
-        for input_box in [self.name_input, self.secret_input]:
+        for input_box in (self.name_input, self.secret_input):
             effect = QGraphicsDropShadowEffect()
             effect.setBlurRadius(8)
             effect.setColor(QColor(0, 0, 0, 30))
@@ -50,33 +58,29 @@ class SecretDetailsDialog(QDialog):
         layout.addRow(QLabel("密钥名称："), self.name_input)
         layout.addRow(QLabel("密钥值："), self.secret_input)
 
-        # 按钮布局
         self.save_button = QPushButton("💾 保存")
-        self.save_button.clicked.connect(self.save_changes)
         self.save_button.setIcon(QIcon("icons/save.png"))
+        self.save_button.clicked.connect(self.save_changes)
 
         self.cancel_button = QPushButton("❌ 取消")
-        self.cancel_button.clicked.connect(self.reject)
         self.cancel_button.setIcon(QIcon("icons/cancel.png"))
+        self.cancel_button.clicked.connect(self.reject)
 
-        button_layout = QHBoxLayout()
-        button_layout.addStretch()
-        button_layout.addWidget(self.save_button)
-        button_layout.addWidget(self.cancel_button)
-        button_layout.setSpacing(12)
+        btn_layout = QHBoxLayout()
+        btn_layout.addStretch()
+        btn_layout.setSpacing(12)
+        btn_layout.addWidget(self.save_button)
+        btn_layout.addWidget(self.cancel_button)
+        layout.addRow(btn_layout)
 
-        layout.addRow(button_layout)
         self.setLayout(layout)
 
     def save_changes(self):
-        """保存更改"""
         name = self.name_input.text().strip()
         secret = self.secret_input.text().strip()
-
         if not name or not secret:
             QMessageBox.warning(self, "错误", "密钥名称和密钥值不能为空！")
             return
-
         try:
             self.save_callback(name, secret)
             self.accept()
@@ -85,33 +89,27 @@ class SecretDetailsDialog(QDialog):
 
 
 class SecureTOTPManagerGUI(QMainWindow):
+    """主界面：离线 2FA 验证工具（安全版）"""
+
     def __init__(self, password):
         super().__init__()
         self.setWindowTitle("离线2FA验证工具（安全版）")
-        self.setGeometry(300, 300, 820, 560)
         self.setWindowIcon(QIcon("icon.png"))
+        self.setGeometry(300, 300, 820, 560)
         self.setMinimumSize(720, 480)
 
-        # 初始化核心逻辑
         self.core = SecureTOTPManager(password)
 
-        # 初始化UI
         self.init_ui()
-
-        # 初始化菜单
         self.init_menu()
-
-        # 刷新表格
         self.refresh_table()
-
-        # 状态栏
         self.statusBar().showMessage(f"就绪 | 总密钥数: {len(self.core.get_secrets())}")
 
     def init_ui(self):
-        """初始化界面组件"""
-        # 主表格
         self.table = QTableWidget(0, 4)
-        self.table.setHorizontalHeaderLabels(["🔖 密钥名称", "🔄 当前验证码", "⏳ 剩余可用时间", "⚙️ 操作"])
+        self.table.setHorizontalHeaderLabels([
+            "🔖 密钥名称", "🔄 当前验证码", "⏳ 剩余可用时间", "⚙️ 操作"
+        ])
         self.table.verticalHeader().setVisible(False)
         self.table.setAlternatingRowColors(True)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
@@ -120,127 +118,77 @@ class SecureTOTPManagerGUI(QMainWindow):
         self.table.setSortingEnabled(True)
         self.table.setSelectionMode(QTableWidget.MultiSelection)
 
-        # 列宽设置
         self.table.setColumnWidth(0, 220)
         self.table.setColumnWidth(1, 160)
         self.table.setColumnWidth(2, 160)
         self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
         self.table.horizontalHeader().setDefaultAlignment(Qt.AlignLeft)
 
-        # 将双击信号与复制槽函数连接
-        # 注意：cellDoubleClicked(int row, int column)
         self.table.cellDoubleClicked.connect(self.on_cell_double_clicked)
 
-        # 主布局
-        main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(16, 16, 16, 16)
-        main_layout.setSpacing(16)
-        main_layout.addWidget(self.table)
+        layout = QVBoxLayout()
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(16)
+        layout.addWidget(self.table)
 
-        # 中央部件
-        central_widget = QWidget()
-        central_widget.setLayout(main_layout)
-        self.setCentralWidget(central_widget)
+        container = QWidget()
+        container.setLayout(layout)
+        self.setCentralWidget(container)
 
-        # 定时器：用于定时更新验证码
-        self.timer = QTimer()
+        self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_totps)
         self.timer.start(1000)
 
+    def init_menu(self):
+        file_menu = self.menuBar().addMenu("📁 文件")
+        exp_all = QAction(QIcon("icons/export.png"), "导出所有密钥", self)
+        imp = QAction(QIcon("icons/import.png"), "导入密钥", self)
+        exit_act = QAction(QIcon("icons/exit.png"), "退出", self)
+        exp_all.triggered.connect(self.export_secrets)
+        imp.triggered.connect(self.import_secrets)
+        exit_act.triggered.connect(self.close)
+        file_menu.addAction(exp_all)
+        file_menu.addAction(imp)
+        file_menu.addSeparator()
+        file_menu.addAction(exit_act)
+
+        key_menu = self.menuBar().addMenu("🔑 密钥管理")
+        add_key = QAction(QIcon("icons/add.png"), "添加密钥", self)
+        add_key.triggered.connect(self.add_secret)
+        key_menu.addAction(add_key)
+
+        help_menu = self.menuBar().addMenu("❓ 帮助")
+        about = QAction(QIcon("icons/about.png"), "关于", self)
+        about.triggered.connect(self.show_about_dialog)
+        help_menu.addAction(about)
+
     def on_cell_double_clicked(self, row, column):
-        """
-        当表格单元格被双击时触发的槽函数。
-        在这里判断是否为「验证码」列，如果是，就把对应验证码复制到剪贴板。
-        """
-        # 这里的column == 1，代表第二列「当前验证码」
         if column == 1:
-            code_item = self.table.item(row, column)
-            if code_item:
-                code_text = code_item.text()
-                # 将文本复制到剪贴板
-                QApplication.clipboard().setText(code_text)
-                # 弹出提示（可用QMessageBox，也可使用状态栏提示）
+            item = self.table.item(row, 1)
+            if item:
+                QApplication.clipboard().setText(item.text())
                 QMessageBox.information(self, "提示", "验证码已复制到剪贴板！")
 
     def import_secrets(self):
-        """从加密文件导入密钥"""
-        file_path, _ = QFileDialog.getOpenFileName(
-            self,
-            "导入密钥",
-            "",
-            "加密文件 (*.enc)",
-            options=QFileDialog.DontUseNativeDialog
-        )
-        if file_path:
-            password, ok = QInputDialog.getText(
-                self,
-                "输入密码",
-                "请输入导出文件时设置的密码：",
-                QLineEdit.Password,
-                flags=Qt.Dialog | Qt.CustomizeWindowHint | Qt.WindowTitleHint
-            )
-            if ok and password:
-                try:
-                    # 调用 core 中的 import_secrets
-                    self.core.import_secrets(file_path, password)
-                    self.refresh_table()
-                    QMessageBox.information(self, "导入成功", "密钥已成功导入！", QMessageBox.Ok)
-                except Exception as e:
-                    QMessageBox.critical(self, "导入失败", f"导入过程中发生错误：\n{str(e)}", QMessageBox.Ok)
-
-    def init_menu(self):
-        """初始化菜单系统"""
-        # 文件菜单
-        file_menu = self.menuBar().addMenu("📁 文件")
-
-        export_all_action = QAction(QIcon("icons/export.png"), "导出所有密钥", self)
-        import_action = QAction(QIcon("icons/import.png"), "导入密钥", self)
-        exit_action = QAction(QIcon("icons/exit.png"), "退出", self)
-
-        export_all_action.triggered.connect(self.export_secrets)
-        import_action.triggered.connect(self.import_secrets)
-        exit_action.triggered.connect(self.close)
-
-        file_menu.addAction(export_all_action)
-        file_menu.addAction(import_action)
-        file_menu.addSeparator()
-        file_menu.addAction(exit_action)
-
-        # 密钥菜单
-        secret_menu = self.menuBar().addMenu("🔑 密钥管理")
-        add_action = QAction(QIcon("icons/add.png"), "添加密钥", self)
-        add_action.triggered.connect(self.add_secret)
-
-        secret_menu.addAction(add_action)
-
-        # 帮助菜单
-        help_menu = self.menuBar().addMenu("❓ 帮助")
-        about_action = QAction(QIcon("icons/about.png"), "关于", self)
-        about_action.triggered.connect(self.show_about_dialog)
-        help_menu.addAction(about_action)
+        path, _ = QFileDialog.getOpenFileName(self, "导入密钥", "", "加密文件 (*.enc)")
+        if not path:
+            return
+        pwd, ok = QInputDialog.getText(self, "输入密码", "请输入导出时设置的密码：", QLineEdit.Password)
+        if ok and pwd:
+            try:
+                self.core.import_secrets(path, pwd)
+                self.refresh_table()
+                QMessageBox.information(self, "导入成功", "密钥已成功导入！")
+            except Exception as e:
+                QMessageBox.critical(self, "导入失败", str(e))
 
     def add_secret(self):
-        """添加新密钥"""
-        name, ok1 = QInputDialog.getText(
-            self, "添加密钥",
-            "请输入密钥名称：",
-            QLineEdit.Normal,
-            "",
-            Qt.Dialog | Qt.CustomizeWindowHint | Qt.WindowTitleHint
-        )
+        name, ok1 = QInputDialog.getText(self, "添加密钥", "请输入密钥名称：", QLineEdit.Normal)
         if not ok1 or not name.strip():
             return
-
-        secret, ok2 = QInputDialog.getText(
-            self, "添加密钥",
-            "请输入 Base32 编码的密钥：",
-            QLineEdit.Normal,
-            "",
-            Qt.Dialog | Qt.CustomizeWindowHint | Qt.WindowTitleHint
-        )
+        secret, ok2 = QInputDialog.getText(self, "添加密钥", "请输入 Base32 编码的密钥：", QLineEdit.Normal)
         if not ok2 or not secret.strip():
             return
-
         try:
             self.core.add_secret(name.strip(), secret.strip())
             self.refresh_table()
@@ -249,301 +197,192 @@ class SecureTOTPManagerGUI(QMainWindow):
             QMessageBox.critical(self, "错误", str(e))
 
     def remove_selected_secret(self):
-        """删除选中密钥（可多选删除）"""
-        selected_rows = self.table.selectionModel().selectedRows()
-        if not selected_rows:
+        rows = self.table.selectionModel().selectedRows()
+        if not rows:
             QMessageBox.warning(self, "警告", "请先选择要删除的密钥！")
             return
-
-        # 二次确认
-        reply = QMessageBox.question(
-            self, "确认删除",
-            f"确定要删除选中的 {len(selected_rows)} 条密钥吗？",
+        confirm = QMessageBox.question(
+            self, "确认删除", f"确定要删除 {len(rows)} 条密钥吗？",
             QMessageBox.Yes | QMessageBox.No
         )
-        if reply != QMessageBox.Yes:
+        if confirm != QMessageBox.Yes:
             return
-
-        # 从后往前删，避免行号变化
-        for index in sorted(selected_rows, key=lambda x: x.row(), reverse=True):
-            row = index.row()
-            key_name = self.table.item(row, 0).text()
-            self.core.remove_secret(key_name)
-
+        for idx in sorted(rows, key=lambda x: x.row(), reverse=True):
+            name = self.table.item(idx.row(), 0).text()
+            self.core.remove_secret(name)
         self.refresh_table()
-        self.statusBar().showMessage(f"已删除 {len(selected_rows)} 条密钥", 3000)
+        self.statusBar().showMessage(f"已删除 {len(rows)} 条密钥", 3000)
 
     def export_secrets(self):
-        """导出所有密钥"""
-        file_path, _ = QFileDialog.getSaveFileName(
-            self, "导出密钥",
-            "", "加密文件 (*.enc)",
-            options=QFileDialog.DontUseNativeDialog
-        )
-        if file_path:
-            password, ok = QInputDialog.getText(
-                self, "设置密码",
-                "请输入导出文件密码：",
-                QLineEdit.Password,
-                flags=Qt.Dialog | Qt.CustomizeWindowHint | Qt.WindowTitleHint
-            )
-            if ok and password:
-                try:
-                    self.core.export_secrets(file_path, password)
-                    QMessageBox.information(
-                        self, "导出成功",
-                        f"密钥已成功导出到：\n{file_path}",
-                        QMessageBox.Ok
-                    )
-                except Exception as e:
-                    QMessageBox.critical(
-                        self, "导出失败",
-                        f"导出过程中发生错误：\n{str(e)}",
-                        QMessageBox.Ok
-                    )
-
-    def export_selected_secrets(self):
-        """
-        导出选中密钥（多个）。
-        使用 self.core.export_specific_secrets 来处理
-        """
-        selected_rows = self.table.selectionModel().selectedRows()
-        if not selected_rows:
-            QMessageBox.warning(self, "警告", "请先选择要导出的密钥！")
+        path, _ = QFileDialog.getSaveFileName(self, "导出密钥", "", "加密文件 (*.enc)")
+        if not path:
             return
-
-        file_path, _ = QFileDialog.getSaveFileName(
-            self, "导出选中密钥",
-            "", "加密文件 (*.enc)",
-            options=QFileDialog.DontUseNativeDialog
-        )
-        if not file_path:
-            return
-
-        password, ok = QInputDialog.getText(
-            self, "设置密码",
-            "请输入导出文件密码：",
-            QLineEdit.Password,
-            flags=Qt.Dialog | Qt.CustomizeWindowHint | Qt.WindowTitleHint
-        )
-        if not ok or not password:
-            return
-
-        # 收集选中的 (name, secret)
-        secrets_to_export = []
-        for index in selected_rows:
-            row = index.row()
-            name = self.table.item(row, 0).text()
-            secret = self.table.item(row, 0).data(Qt.UserRole)  # 存在于第一列的UserRole
-            if name and secret:
-                secrets_to_export.append((name, secret))
-
-        if not secrets_to_export:
-            QMessageBox.warning(self, "警告", "无有效密钥可导出！")
-            return
-
-        try:
-            self.core.export_specific_secrets(secrets_to_export, file_path, password)
-            QMessageBox.information(
-                self, "导出成功",
-                f"选中的密钥已成功导出到：\n{file_path}",
-                QMessageBox.Ok
-            )
-        except Exception as e:
-            QMessageBox.critical(
-                self, "导出失败",
-                f"导出过程中发生错误：\n{str(e)}",
-                QMessageBox.Ok
-            )
+        pwd, ok = QInputDialog.getText(self, "设置密码", "请输入导出文件密码：", QLineEdit.Password)
+        if ok and pwd:
+            try:
+                self.core.export_secrets(path, pwd)
+                QMessageBox.information(self, "导出成功", f"密钥已导出到：\n{path}")
+            except Exception as e:
+                QMessageBox.critical(self, "导出失败", str(e))
 
     def refresh_table(self):
-        """刷新表格数据"""
+        """刷新表格并立即更新验证码与倒计时"""
+        # 先关掉排序，避免插入行时导致按钮错位
+        self.table.setSortingEnabled(False)
+        # 清空所有行
         self.table.setRowCount(0)
-        secrets = self.core.get_secrets()
 
+        secrets = self.core.get_secrets()
         for name, secret in secrets:
             row = self.table.rowCount()
             self.table.insertRow(row)
 
-            # 密钥名称
+            # ——— 名称列 ———
             name_item = QTableWidgetItem(name)
             name_item.setData(Qt.UserRole, secret)
             name_item.setTextAlignment(Qt.AlignCenter)
             self.table.setItem(row, 0, name_item)
 
-            # 验证码和剩余时间
-            try:
-                token = TOTP.get_totp_token(secret)
-                remaining = 30 - int(time.time() % 30)
+            # ——— 验证码 / 倒计时 占位 ———
+            self.table.setItem(row, 1, QTableWidgetItem())
+            self.table.setItem(row, 2, QTableWidgetItem())
 
-                # 验证码显示
-                token_item = QTableWidgetItem(token)
-                token_item.setFont(QFont("Consolas", 14, QFont.Bold))
-                self.table.setItem(row, 1, token_item)
-
-                # 剩余时间
-                time_item = QTableWidgetItem(f"{remaining} 秒")
-                time_item.setFont(QFont("Arial", 11, QFont.Medium))
-                self.table.setItem(row, 2, time_item)
-
-            except Exception:
-                # 若密钥无效则显示提示
-                error_item = QTableWidgetItem("无效密钥")
-                self.table.setItem(row, 1, error_item)
-                self.table.setItem(row, 2, QTableWidgetItem("N/A"))
-
-            # 操作区：查看/编辑、删除、导出
+            # ——— 操作按钮列 ———
             btn_widget = QWidget()
             btn_layout = QHBoxLayout(btn_widget)
             btn_layout.setContentsMargins(0, 0, 0, 0)
             btn_layout.setSpacing(6)
 
-            # 查看/编辑
+            # “查看/编辑”
             view_btn = QPushButton("查看/编辑")
             view_btn.setIcon(QIcon("icons/edit.png"))
-            view_btn.clicked.connect(lambda _, n=name, s=secret: self.view_edit_secret(n, s))
+            view_btn.clicked.connect(
+                partial(self.view_edit_secret, name, secret)
+            )
             btn_layout.addWidget(view_btn)
 
-            # 删除
-            remove_btn = QPushButton("删除")
-            remove_btn.setIcon(QIcon("icons/remove.png"))
-            remove_btn.clicked.connect(lambda _, n=name: self.remove_single_secret(n))
-            btn_layout.addWidget(remove_btn)
+            # “删除”
+            del_btn = QPushButton("删除")
+            del_btn.setIcon(QIcon("icons/remove.png"))
+            del_btn.clicked.connect(
+                partial(self.remove_single_secret, name)
+            )
+            btn_layout.addWidget(del_btn)
 
-            # 导出
-            export_btn = QPushButton("导出")
-            export_btn.setIcon(QIcon("icons/export_part.png"))
-            export_btn.clicked.connect(lambda _, n=name, s=secret: self.export_single_secret(n, s))
-            btn_layout.addWidget(export_btn)
+            # “导出”
+            exp_btn = QPushButton("导出")
+            exp_btn.setIcon(QIcon("icons/export_part.png"))
+            exp_btn.clicked.connect(
+                partial(self.export_single_secret, name, secret)
+            )
+            btn_layout.addWidget(exp_btn)
 
             btn_layout.addStretch()
             self.table.setCellWidget(row, 3, btn_widget)
 
-        # 更新状态栏
+        # 重新打开排序
+        self.table.setSortingEnabled(True)
+        # 刷新完马上填验证码＋倒计时
+        self.update_totps()
         self.statusBar().showMessage(f"就绪 | 总密钥数: {len(secrets)}")
 
+    def update_totps(self):
+        now = time.time()
+        remain = 30 - int(now % 30)
+        for row in range(self.table.rowCount()):
+            secret = self.table.item(row, 0).data(Qt.UserRole)
+
+            # 更新验证码
+            try:
+                token = TOTP.get_totp_token(secret)
+            except Exception:
+                token = "无效密钥"
+
+            token_item = self.table.item(row, 1)
+            if token_item is None:
+                token_item = QTableWidgetItem()
+                self.table.setItem(row, 1, token_item)
+            token_item.setText(token)
+            if token != "无效密钥":
+                token_item.setFont(QFont("Consolas", 14, QFont.Bold))
+
+            # 更新剩余时间
+            time_item = self.table.item(row, 2)
+            if time_item is None:
+                time_item = QTableWidgetItem()
+                self.table.setItem(row, 2, time_item)
+            time_item.setText(f"{remain} 秒")
+            time_item.setFont(QFont("Arial", 11, QFont.Medium))
+
     def remove_single_secret(self, name):
-        """删除单个密钥"""
-        reply = QMessageBox.question(
-            self, "确认删除",
-            f"确定要删除密钥 '{name}' 吗？",
+        ans = QMessageBox.question(
+            self, "确认删除", f"确定要删除密钥 '{name}' 吗？",
             QMessageBox.Yes | QMessageBox.No
         )
-        if reply == QMessageBox.Yes:
+        if ans == QMessageBox.Yes:
             self.core.remove_secret(name)
             self.refresh_table()
             self.statusBar().showMessage(f"已删除密钥：{name}", 3000)
 
     def export_single_secret(self, name, secret):
-        """导出单个密钥"""
-        file_path, _ = QFileDialog.getSaveFileName(
-            self, "导出密钥",
-            f"{name}.enc", "加密文件 (*.enc)",
-            options=QFileDialog.DontUseNativeDialog
-        )
-        if not file_path:
+        path, _ = QFileDialog.getSaveFileName(self, "导出密钥", f"{name}.enc", "加密文件 (*.enc)")
+        if not path:
             return
-
-        password, ok = QInputDialog.getText(
-            self, "设置密码",
-            f"为 '{name}' 设定导出文件密码：",
-            QLineEdit.Password,
-            flags=Qt.Dialog | Qt.CustomizeWindowHint | Qt.WindowTitleHint
-        )
-        if not ok or not password:
-            return
-
-        try:
-            # 通过核心逻辑只导出此一条
-            self.core.export_specific_secrets([(name, secret)], file_path, password)
-            QMessageBox.information(
-                self, "导出成功",
-                f"密钥 '{name}' 已成功导出到：\n{file_path}",
-                QMessageBox.Ok
-            )
-        except Exception as e:
-            QMessageBox.critical(
-                self, "导出失败",
-                f"导出过程中发生错误：\n{str(e)}",
-                QMessageBox.Ok
-            )
+        pwd, ok = QInputDialog.getText(self, "设置密码", f"为 '{name}' 设置密码：", QLineEdit.Password)
+        if ok and pwd:
+            try:
+                export_specific_secrets([(name, secret)], path, pwd)
+                QMessageBox.information(self, "导出成功", f"'{name}' 已导出到：\n{path}")
+            except Exception as e:
+                QMessageBox.critical(self, "导出失败", str(e))
 
     def view_edit_secret(self, name, secret):
-        """查看/编辑密钥"""
-
-        def save_callback(new_name, new_secret):
+        def save_cb(new_name, new_secret):
             self.core.remove_secret(name)
             self.core.add_secret(new_name, new_secret)
             self.refresh_table()
             self.statusBar().showMessage(f"成功更新密钥：{new_name}", 3000)
 
-        dialog = SecretDetailsDialog(self, name, secret, save_callback)
-        dialog.exec_()
-
-    def update_totps(self):
-        """更新验证码显示"""
-        current_time = time.time()
-        if int(current_time % 30) == 0:
-            # 每30秒完整刷新一次
-            self.refresh_table()
-        else:
-            # 每秒更新剩余时间
-            for row in range(self.table.rowCount()):
-                remaining = 30 - int(current_time % 30)
-                time_item = self.table.item(row, 2)
-                if time_item:
-                    time_item.setText(f"{remaining} 秒")
+        dlg = SecretDetailsDialog(self, name, secret, save_cb)
+        dlg.exec()
 
     def show_about_dialog(self):
-        """显示关于对话框"""
-        about_text = """
+        about_html = """
         <h3>离线2FA验证工具（安全版）</h3>
-        <p>版本：1.0</p>
+        <p>版本：1.1</p>
         <p>作者：Hellohistory</p>
-        <p>特性：</p>
         <ul>
-            <li>完全离线运行且开源</li>
-            <li>加密存储</li>
-            <li>支持TOTP标准</li>
-            <li>跨平台支持</li>
+          <li>完全离线运行且开源</li>
+          <li>加密存储</li>
+          <li>支持 TOTP 标准</li>
+          <li>跨平台支持</li>
         </ul>
         <hr>
-        <h4>开源信息</h4>
-        <p>本项目核心代码采用 <b>MIT</b> 协议开源。</p>由于使用<b>QT</b>制作GUI，所以GUI部分为<b>GPL</b>协议
-        <p>查看源代码请访问：
-            <a href="https://github.com/Hellohistory/OpenPrepTools" target="_blank">GitHub</a> 
-            或 
-            <a href="https://gitee.com/Hellohistory/OpenPrepTools" target="_blank">Gitee</a>
-        </p>
+        <p>协议：核心 MIT 开源，GUI 部分 LGPL协议</p>
+        <p>源码：<a href="https://github.com/Hellohistory/OpenPrepTools">GitHub</a>
+         或 <a href="https://gitee.com/Hellohistory/OpenPrepTools">Gitee</a></p>
         """
-
         msg = QMessageBox(self)
         msg.setWindowTitle("关于")
         msg.setIconPixmap(QPixmap("icon.png").scaled(64, 64))
-        msg.setTextFormat(Qt.RichText)  # 允许使用富文本（HTML）
-        msg.setText(about_text)
-        msg.exec_()
+        msg.setTextFormat(Qt.RichText)
+        msg.setText(about_html)
+        msg.exec()
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    password, ok = QInputDialog.getText(
+    pwd, ok = QInputDialog.getText(
         None,
         "密码验证",
-        "请输入主密码：\n\n（该密码将用于保护您所有的离线 2FA 密钥，此密码无法恢复，无法找回，请务必牢记！！！！！！）",
-        QLineEdit.Password,
-        flags=Qt.Dialog | Qt.CustomizeWindowHint | Qt.WindowTitleHint
+        "请输入主密码：\n（该密码用于保护所有离线 2FA 密钥，无法找回，请务必牢记）",
+        QLineEdit.Password
     )
-
-    if ok and password:
+    if ok and pwd:
         try:
-            window = SecureTOTPManagerGUI(password)
+            window = SecureTOTPManagerGUI(pwd)
             window.show()
-            sys.exit(app.exec_())
+            sys.exit(app.exec())
         except Exception as e:
-            QMessageBox.critical(
-                None, "致命错误",
-                f"程序初始化失败：\n{str(e)}",
-                QMessageBox.Ok
-            )
+            QMessageBox.critical(None, "致命错误", str(e))
             sys.exit(1)

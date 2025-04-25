@@ -29,6 +29,39 @@ def _generate_iv():
     return os.urandom(IV_SIZE)
 
 
+def export_specific_secrets(secrets_list, export_file, export_password):
+    """
+    导出指定的部分密钥到加密文件。
+    :param secrets_list: List[Tuple[str, str]]
+        外部传入的 (name, secret) 列表，可只导出其中部分。
+    :param export_file: str
+        目标加密文件路径。
+    :param export_password: str
+        用于加密导出文件的密码。
+    """
+    # 只加密 secrets_list 中的数据
+    # 形式与 export_secrets 保持一致
+    data_dict = {}
+    for name, secret in secrets_list:
+        # 如果 secret == "解密失败" 可以考虑跳过或抛异常，这里选择跳过
+        if secret and secret != "解密失败":
+            data_dict[name] = secret
+
+    data_to_encrypt = json.dumps(data_dict)
+    derived_key = _derive_key(export_password)
+    iv = _generate_iv()
+    cipher = Cipher(algorithms.AES(derived_key), modes.CBC(iv))
+    encryptor = cipher.encryptor()
+    padder = padding.PKCS7(algorithms.AES.block_size).padder()
+
+    padded_data = padder.update(data_to_encrypt.encode()) + padder.finalize()
+    encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
+
+    # 写入文件
+    with open(export_file, "wb") as file:
+        file.write(iv + encrypted_data)
+
+
 class SecureTOTPManager:
     def __init__(self, password):
         self.db_file = DB_FILE
@@ -167,35 +200,3 @@ class SecureTOTPManager:
                 self.add_secret(name, secret)
             except ValueError:
                 print(f"密钥 {name} 已存在，跳过导入。")
-
-    def export_specific_secrets(self, secrets_list, export_file, export_password):
-        """
-        导出指定的部分密钥到加密文件。
-        :param secrets_list: List[Tuple[str, str]]
-            外部传入的 (name, secret) 列表，可只导出其中部分。
-        :param export_file: str
-            目标加密文件路径。
-        :param export_password: str
-            用于加密导出文件的密码。
-        """
-        # 只加密 secrets_list 中的数据
-        # 形式与 export_secrets 保持一致
-        data_dict = {}
-        for name, secret in secrets_list:
-            # 如果 secret == "解密失败" 可以考虑跳过或抛异常，这里选择跳过
-            if secret and secret != "解密失败":
-                data_dict[name] = secret
-
-        data_to_encrypt = json.dumps(data_dict)
-        derived_key = _derive_key(export_password)
-        iv = _generate_iv()
-        cipher = Cipher(algorithms.AES(derived_key), modes.CBC(iv))
-        encryptor = cipher.encryptor()
-        padder = padding.PKCS7(algorithms.AES.block_size).padder()
-
-        padded_data = padder.update(data_to_encrypt.encode()) + padder.finalize()
-        encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
-
-        # 写入文件
-        with open(export_file, "wb") as file:
-            file.write(iv + encrypted_data)
