@@ -8,3 +8,4 @@
 # 忽略所有 __pycache__ 目录及其 .pyc
 __pycache__/
 *.py[cod]
+/dist/
