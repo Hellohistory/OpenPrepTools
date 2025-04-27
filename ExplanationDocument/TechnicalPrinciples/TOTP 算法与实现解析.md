@@ -1,12 +1,12 @@
 ## 1.前言
 
-离线2FA验证器当中核心的算法实现是基于 `totp_core.py` 代码实现，其中一个用于生成和验证 TOTP（Time-based One-Time Password，基于时间的一次性密码）的类。TOTP 是一种动态口令认证方式，常见于双重认证（2FA）中。
+离线2FA验证器当中核心的算法实现是基于 `totp_hotp_core.py` 代码实现，其中一个用于生成和验证 TOTP（Time-based One-Time Password，基于时间的一次性密码）的类。TOTP 是一种动态口令认证方式，常见于双重认证（2FA）中。
 ## 2. 技术简介
 
 TOTP（Time-based One-Time Password）是一种广泛应用于身份验证的安全机制，常见于 Google Authenticator、Microsoft Authenticator 等认证工具中。
 TOTP 的核心原理是基于当前的时间戳和一个共享的密钥（通常是 Base32 编码的密钥）生成一个短期有效的动态验证码，通常是 6 位数字。该验证码会在每个时间周期（如每 30 秒）更新一次。
 
-本文将详细讲解 `totp_core.py` 代码实现，分析 TOTP 验证码的生成和密钥验证过程。
+本文将详细讲解 `totp_hotp_core.py` 代码实现，分析 TOTP 验证码的生成和密钥验证过程。
 
 ## 3. TOTP 算法原理讲解
 
@@ -14,7 +14,7 @@ TOTP 基于哈希和时间的结合，确保每个时间步长内生成的验证
 
 ## 4. 代码结构介绍
 
-`totp_core.py` 中的 `TOTP` 类包含两个静态方法：`get_totp_token` 和 `validate_secret`。这两个方法分别用于生成 TOTP 验证码和验证 Base32 编码的密钥。
+`totp_hotp_core.py` 中的 `TOTP` 类包含两个静态方法：`get_totp_token` 和 `validate_secret`。这两个方法分别用于生成 TOTP 验证码和验证 Base32 编码的密钥。
 
 ### 4.1 `get_totp_token` 方法
 
