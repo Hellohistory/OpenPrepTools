@@ -1,0 +1,41 @@
+/* style_orange.qss — 橙色主题 */
+* {
+    font-family: "Microsoft YaHei", "PingFang SC", "Sans-serif";
+    font-size: 14px;
+}
+
+QMainWindow {
+    background: #fff8e7;
+}
+
+QLineEdit {
+    padding: 6px;
+    border: 1px solid #ffa726; /* Orange */
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+QPushButton {
+    padding: 6px 14px;
+    background: #fb8c00; /* DarkOrange */
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+QPushButton:hover { background: #f57c00; }
+QPushButton:pressed { background: #ef6c00; }
+
+QTableWidget {
+    border: 1px solid #ffa726;
+}
+QHeaderView::section {
+    padding: 4px;
+    background: #ffd180; /* LightOrange */
+    border: 1px solid #ffa726;
+}
+
+QTableView::item:selected,
+QTableWidget::item:selected {
+    background: #fb8c00;
+    color: white;
+}

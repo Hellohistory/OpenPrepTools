@@ -1,0 +1,41 @@
+/* style_highcontrast.qss — 高对比主题 */
+* {
+    font-family: "Microsoft YaHei", "PingFang SC", "Sans-serif";
+    font-size: 14px;
+}
+
+QMainWindow { background: #ffffff; }
+
+QLineEdit {
+    padding: 6px;
+    border: 2px solid #000000;
+    background: #ffffff;
+    color: #000000;
+}
+
+QPushButton {
+    padding: 8px 16px;
+    background: #000000;
+    color: #ffffff;
+    border: 2px solid #000000;
+}
+QPushButton:hover { background: #ffffff; color: #000000; }
+QPushButton:pressed { background: #000000; color: #ffffff; }
+
+QTableWidget {
+    border: 2px solid #000000;
+    background: #ffffff;
+    color: #000000;
+}
+QHeaderView::section {
+    padding: 4px;
+    background: #000000;
+    color: #ffffff;
+    border: 2px solid #000000;
+}
+
+QTableView::item:selected,
+QTableWidget::item:selected {
+    background: #ff0000;
+    color: #ffffff;
+}

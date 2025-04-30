@@ -1,0 +1,120 @@
+/* style.qss — 默认主题：晶蓝风格 */
+/* 设计思路：清新浅色基调，按钮晶蓝色，高亮简洁，圆角微阴影 */
+
+* {
+    /* 全局字体及基础设置 */
+    font-family: "Microsoft YaHei", "PingFang SC", "Sans-serif";
+    font-size: 14px;
+    color: #333333;
+}
+
+/* 主窗口背景 */
+QMainWindow {
+    background-color: #f5f7fa;
+}
+
+/* 文本输入框 */
+QLineEdit {
+    padding: 6px 8px;
+    border: 1px solid #cfd8e3;
+    border-radius: 4px;
+    background-color: #ffffff;
+    selection-background-color: #cce4f7;
+    selection-color: #333333;
+}
+
+/* 按钮 */
+QPushButton {
+    padding: 6px 16px;
+    background-color: #4a90e2;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    min-height: 28px;
+}
+QPushButton:hover {
+    background-color: #357abd;
+}
+QPushButton:pressed {
+    background-color: #2c6db5;
+}
+
+/* 表格整体 */
+QTableWidget {
+    border: 1px solid #e0e0e0;
+    background-color: #ffffff;
+    gridline-color: #e0e0e0;
+}
+
+/* 表头 */
+QHeaderView::section {
+    padding: 6px;
+    background-color: #e8edf2;
+    border: 1px solid #d1d9e3;
+    border-bottom: none;
+    font-weight: bold;
+}
+
+/* 表格选中行/单元格 */
+QTableView::item:selected,
+QTableWidget::item:selected {
+    background-color: #a8d1fc;
+    color: #1a1a1a;
+}
+
+/* 滚动条（垂直） */
+QScrollBar:vertical {
+    width: 8px;
+    background: transparent;
+    margin: 0px 0px 0px 0px;
+}
+QScrollBar::handle:vertical {
+    background: #c1c9d6;
+    min-height: 20px;
+    border-radius: 4px;
+}
+QScrollBar::handle:vertical:hover {
+    background: #a8b4c3;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+/* 滚动条（水平） */
+QScrollBar:horizontal {
+    height: 8px;
+    background: transparent;
+    margin: 0px 0px 0px 0px;
+}
+QScrollBar::handle:horizontal {
+    background: #c1c9d6;
+    min-width: 20px;
+    border-radius: 4px;
+}
+QScrollBar::handle:horizontal:hover {
+    background: #a8b4c3;
+}
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0;
+}
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+/* 对话框标题 */
+QDialog {
+    background-color: #f5f7fa;
+}
+
+/* 工具提示 */
+QToolTip {
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #cfd8e3;
+    border-radius: 4px;
+    padding: 4px;
+}
+

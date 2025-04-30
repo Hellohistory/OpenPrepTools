@@ -1,0 +1,41 @@
+/* style_green.qss — 绿色主题 */
+* {
+    font-family: "Microsoft YaHei", "PingFang SC", "Sans-serif";
+    font-size: 14px;
+}
+
+QMainWindow {
+    background: #f2fff2;
+}
+
+QLineEdit {
+    padding: 6px;
+    border: 1px solid #66cdaa; /* MediumAquaMarine */
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+QPushButton {
+    padding: 6px 14px;
+    background: #4caf50; /* Green */
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+QPushButton:hover { background: #43a047; }
+QPushButton:pressed { background: #388e3c; }
+
+QTableWidget {
+    border: 1px solid #66cdaa;
+}
+QHeaderView::section {
+    padding: 4px;
+    background: #98fb98; /* PaleGreen */
+    border: 1px solid #66cdaa;
+}
+
+QTableView::item:selected,
+QTableWidget::item:selected {
+    background: #4caf50;
+    color: white;
+}

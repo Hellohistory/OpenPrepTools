@@ -1,0 +1,4 @@
+PySide2
+requests
+opencc
+nuitka
