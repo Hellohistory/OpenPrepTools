@@ -124,7 +124,7 @@ class MainWindow(QMainWindow):
         msg.setTextFormat(Qt.RichText)
         msg.setText(
             f"<p><b>作者：</b>Hellohistory</p>"
-            f"<p><b>版本号：</b>v1.2</p>"
+            f"<p><b>版本号：</b>v1.3</p>"
             f"<p><b>GitHub：</b>"
             f"<a href='{GITHUB_URL}'>{GITHUB_URL}</a></p>"
             f"<p><b>Gitee：</b>"

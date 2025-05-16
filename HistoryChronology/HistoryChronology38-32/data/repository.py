@@ -58,6 +58,20 @@ class ChronologyRepository:
         variants.add(self._cc_t2s.convert(text))
         return variants
 
+    def _split_keyword(self, keyword: str) -> List[str]:
+        """
+        特殊关键词分解映射。比如“東周（春秋）”可分解为["東周", "春秋"]
+        可以扩展更多映射
+        """
+        mapping = {
+            "東周（春秋）": ["東周", "春秋"],
+            "东周（春秋）": ["东周", "春秋"],
+            "東周（戰國）": ["東周", "戰國"],
+            "东周（战国）": ["东周", "战国"],
+        }
+        # 命中特殊分词直接返回分解后的列表，否则返回原关键词
+        return mapping.get(keyword, [keyword])
+
     def get_entries_by_year(self, year: int) -> List[HistoryEntry]:
         """
         根据公元年份查询所有匹配记录
@@ -77,29 +91,41 @@ class ChronologyRepository:
         """
         根据关键字模糊查询，支持简繁体互转
         查询字段：干支、帝号、帝名、年号、时期、政权
+        支持特殊关键词分解
         """
-        variants = self._generate_variants(keyword)
-        # 在原有字段基础上加入“干支”
-        text_cols = ["干支", "帝号", "帝名", "年号", "时期", "政权"]
-        conditions: List[str] = []
-        params: List[str] = []
+        # 先分解关键字
+        keywords = self._split_keyword(keyword)
+        all_results: List[HistoryEntry] = []
+        seen_keys = set()  # 用于去重
 
-        # 为每个变体和每个字段构造 LIKE 条件
-        for var in variants:
-            like = f"%{var}%"
-            for col in text_cols:
-                conditions.append(f"{col} LIKE ?")
-                params.append(like)
+        for key in keywords:
+            variants = self._generate_variants(key)
+            text_cols = ["干支", "帝号", "帝名", "年号", "时期", "政权"]
+            conditions: List[str] = []
+            params: List[str] = []
 
-        where_sql = " OR ".join(conditions)
-        sql = f"""
-            SELECT 公元, 干支, 时期, 政权, 帝号, 帝名, 年号, 年份
-            FROM history_chronology
-            WHERE {where_sql}
-            ORDER BY 公元, 年份
-        """
-        cur = self._conn.execute(sql, tuple(params))
-        return self._rows_to_entries(cur.fetchall())
+            for var in variants:
+                like = f"%{var}%"
+                for col in text_cols:
+                    conditions.append(f"{col} LIKE ?")
+                    params.append(like)
+            where_sql = " OR ".join(conditions)
+            sql = f"""
+                SELECT 公元, 干支, 时期, 政权, 帝号, 帝名, 年号, 年份
+                FROM history_chronology
+                WHERE {where_sql}
+                ORDER BY 公元, 年份
+            """
+            cur = self._conn.execute(sql, tuple(params))
+            results = self._rows_to_entries(cur.fetchall())
+
+            # 去重（假设year_ad + emperor_title + reign_title唯一标识一条记录）
+            for entry in results:
+                unique_key = (entry.year_ad, entry.ganzhi, entry.emperor_title, entry.reign_title)
+                if unique_key not in seen_keys:
+                    seen_keys.add(unique_key)
+                    all_results.append(entry)
+        return all_results
 
     def advanced_query(
         self,
