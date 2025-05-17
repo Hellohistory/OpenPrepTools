@@ -314,15 +314,17 @@ class MainWindow(QMainWindow):
         tbl = self.table
         tbl.setRowCount(len(entries))
         for r, e in enumerate(entries):
+            # 年号顺序可能为 None，这里要兼容
+            regnal_year_str = str(int(e.regnal_year)) if e.regnal_year is not None else ""
             row = [
                 str(e.year_ad),
-                e.ganzhi,
-                e.period,
-                e.regime,
-                e.emperor_title,
-                e.emperor_name,
-                e.reign_title,
-                f"{int(e.regnal_year)}",
+                e.ganzhi or "",
+                e.period or "",
+                e.regime or "",
+                e.emperor_title or "",
+                e.emperor_name or "",
+                e.reign_title or "",
+                regnal_year_str,
             ]
             for c, v in enumerate(row):
                 tbl.setItem(r, c, QTableWidgetItem(v))

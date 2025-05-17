@@ -11,8 +11,8 @@ DB_PATH: Path = Path(__file__).parent / "resources" / "History_Chronology.db"
 REMOTE_DB_URL: str = "https://github.com/Hellohistory/OpenPrepTools/blob/master/history_chronology/resources/History_Chronology.db"
 
 # 支持的年份上下限
-YEAR_MIN: int = -841
-YEAR_MAX: int = 1911
+YEAR_MIN: int = -840
+YEAR_MAX: int = 1912
 
 # 各种主题样式表路径
 LIGHT_STYLE_QSS: Path = Path(__file__).parent / "resources" / "style.qss"

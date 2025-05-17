@@ -1,4 +1,3 @@
-# data/repository.py
 """
 数据访问层：封装 SQLite 查询，支持简繁体混合检索
 """
@@ -140,7 +139,7 @@ class ChronologyRepository:
         reign_title: str | None = None,
     ) -> List[HistoryEntry]:
         """
-        多条件组合查询，所有文本条件均支持简繁体互转
+        多条件组合查询，所有文本条件均支持简繁体互转和特殊分解
         支持字段：公元区间、干支、时期、政权、帝号、帝名、年号
         """
         conditions: List[str] = []
@@ -154,11 +153,19 @@ class ChronologyRepository:
             conditions.append("公元 <= ?")
             params.append(year_to)
 
-        # 文本列条件，使用简繁转换
+        # 需要支持特殊关键词分解和简繁体变体的文本字段
         def add_text_condition(col: str, val: str) -> None:
-            for variant in self._generate_variants(val):
-                conditions.append(f"{col} LIKE ?")
-                params.append(f"%{variant}%")
+            # 先进行特殊关键词分解（兼容如“东周（春秋）”等）
+            keywords = self._split_keyword(val)
+            # 支持多个关键词（如东周、春秋、战国都能被命中）
+            col_conditions = []
+            for key in keywords:
+                for variant in self._generate_variants(key):
+                    col_conditions.append(f"{col} LIKE ?")
+                    params.append(f"%{variant}%")
+            if col_conditions:
+                # 多个关键词同字段之间是OR关系
+                conditions.append(f"({' OR '.join(col_conditions)})")
 
         # 干支关键字
         if ganzhi:
