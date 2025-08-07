@@ -21,7 +21,7 @@
 | 0005 | PDF 转长图工具         | 将 PDF 转换为高分辨率长图             | [源码](Graph/PDF2Longimg.py) | [说明](ExplanationDocument/PDF转长图.md) | [下载 密码: 8erg](https://xmy521.lanzouy.com/b0j0jtrxi) |
 | 0006 | 灰度转黑白图工具        | 将灰度图像二值化处理为黑白图像          | [源码](Graph/Convert2BlackWhite) | [说明](ExplanationDocument/灰度图片转黑白图片.md) | [下载 密码: 50yx](https://xmy521.lanzouy.com/b0j0jtsij) |
 | 0007 | 变量函数名翻译工具       | 快速翻译代码中的变量/函数名为规范命名       | [源码](Other/CodeTranslation) | [说明](ExplanationDocument/代码变量函数名翻译工具.md) | [下载](https://xmy521.lanzouy.com/iKP4H2uphqcd) |
-| 0008 | 网易云单曲下载器        | 支持下载网易云音乐的指定单曲            | [源码](Other/163_music_download) | [说明](ExplanationDocument/网易云单曲下载工具.md) | [下载 密码: 5bkp](https://xmy521.lanzouy.com/b0j0jtrmh) |
+| 0008 | 网易云单曲下载器        | 支持下载网易云音乐的指定单曲            | [源码](https://github.com/Hellohistory/163_music_download) | [说明](https://github.com/Hellohistory/163_music_download) | [下载](https://github.com/Hellohistory/163_music_download/releases) |
 | 0009 | 万能视频下载器         | 支持多平台视频批量下载（含解析）         | [源码](Downloader/UniversalVideoDownloader) | [说明](ExplanationDocument/万能视频下载器.md) | [下载 密码: amor](https://xmy521.lanzouy.com/b0j0jv3be) |
 | 0010 | 离线 2FA 验证工具       | 支持离线生成 TOTP/HOTP 验证码         | [源码](Other/2FA_Tool) | [说明](ExplanationDocument/离线2FA验证工具.md) | [下载 密码: bqju](https://xmy521.lanzouy.com/b0j0jtqze) |
 | 0011 | 中华甲子历史年表        | 查询并可视化中华上下五千年纪年系统        | [源码](HistoryChronology) | [说明](ExplanationDocument/中华甲子历史年表.md) | [下载 密码: 9jyo](https://xmy521.lanzouy.com/b0j0jtqsh) |
